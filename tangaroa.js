@@ -1,11 +1,13 @@
 const MAX_Y = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-const MAX_X = MAX_Y;//Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+const MAX_X = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
 var canvas = document.getElementById("map");
 var ctx = canvas.getContext("2d");
 
 var map;
 var mask;
+var motu;
+var reef;
 
 
 
@@ -15,11 +17,12 @@ function setUp(){
 
 	noise.seed(Math.random()*1000);
 
-	//map = gen_noise_map(MAX_X, MAX_Y, 50, 4, 0.5, 2);
 	let data = gen_island(MAX_X,MAX_Y)
 
 	map = data[0];
 	mask = data[1];
+	motu = data[2];
+	reef = data[3];
 
 	drawMap(map);
 }
@@ -31,6 +34,7 @@ function rgb(r,g,b){
 function drawMap(map){
 	for(let i=0;i<MAX_X;i++){
 		for(let j=0; j<MAX_Y; j++){
+
 			if(map[i][j]<0.1){
 				ctx.fillStyle = "darkblue";
 			}
