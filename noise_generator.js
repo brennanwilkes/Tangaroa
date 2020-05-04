@@ -1,4 +1,16 @@
 
+const MOTU_GRAD = [0.1,0.15,0.2,0.3];
+
+const MOTU_SCALE = 50;
+const MOTU_OCT = 1;
+const MOTU_PERSIST = 2;
+const MOTU_LAC = 0.95;
+
+const ISL_SCALE = 25;
+const ISL_OCT = 8;
+const ISL_PERSIST = 2;
+const ISL_LAC = 0.75;
+
 //nomralize a value to between 0 and 1 based on min and max
 function normalize(val, min, max){
 	return (val-min)/(max-min);
@@ -64,17 +76,44 @@ function dist(x,y,w,h){
 }
 
 //25,8,8,0.75
-function gen_island(width, height){
-	let map = gen_noise_map(width, height, 25,8,8,0.75);
+function gen_island(width, height,seed=Math.random()*1000){
+
+	//generate base map
+	let map = gen_noise_map(width, height, ISL_SCALE,ISL_OCT,ISL_PERSIST,ISL_LAC,seed);
+
+	//Raise the height
 	map.maxHeight = 1;
 	map.minHeight = -0.5;
 	map = normalize_map(map);
 
+	//Lower edges
 	for(let x=0;x<width;x++){
 		for(let y=0;y<height;y++){
 			map[x][y] *= dist(x,y,width,height);
 		}
 	}
+
+
+	//Add motus
+
+	let motu_noise =  gen_noise_map(width, height, MOTU_SCALE,MOTU_OCT,MOTU_PERSIST,MOTU_LAC,seed+1);
+	motu_noise.maxHeight = 1;
+	motu_noise.minHeight = -2;
+	motu_noise = normalize_map(motu_noise);
+
+	let seed_scale = normalize(Math.round(seed)%250+750,0,1000);
+
+	for(let x=0;x<width;x++){
+		for(let y=0;y<height;y++){
+			if(map[x][y] > MOTU_GRAD[0] && map[x][y] < MOTU_GRAD[1]){
+				map[x][y] += motu_noise[x][y]*seed_scale*0.2;
+			}
+			else if(map[x][y] > MOTU_GRAD[2] && map[x][y] < MOTU_GRAD[3]){
+				map[x][y] += motu_noise[x][y]*seed_scale*-0.4;
+			}
+		}
+	}
+
 
 
 	return map;
