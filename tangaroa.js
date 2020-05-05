@@ -23,11 +23,17 @@ function setUp(){
 	canvas.height = MAX_Y;
 
 	player = new Object();
-	player.x = Math.round(MAX_X/2);
-	player.y = Math.round(MAX_Y/2);
+	player.rx = 0;
+	player.ry = 0;
+	player.x = 0;
+	player.y = 0;
 	player.rot = Math.PI/2;
 	player.xs = 0;
 	player.ys = 0;
+	player.speed = 0;
+
+	player.onbeach = false;
+	player.onground = false;
 
 	player.left = false;
 	player.right = false;
@@ -56,6 +62,21 @@ function key_up(event){
 	}
 }
 
+function draw_tri(){
+	ctx.save();
+	ctx.fillStyle = "brown";
+	ctx.translate(MAX_X/2,MAX_Y/2);
+	ctx.rotate(player.rot);
+	ctx.rotate(Math.PI*-0.5);
+	ctx.beginPath();
+
+	ctx.lineTo(10, 0);
+	ctx.lineTo(0, -10);
+	ctx.lineTo(-10, 0);
+	ctx.fill();
+	ctx.restore();
+}
+
 function tick(event){
 	if(player.right){
 		player.rot = (player.rot+(Math.PI/100))%(Math.PI*2);
@@ -64,19 +85,51 @@ function tick(event){
 		player.rot = (player.rot-(Math.PI/100))%(Math.PI*2);
 	}
 
-	player.xs = player.xs > 0 ? Math.max(0,player.xs-=0.1) : Math.min(0,player.xs+=0.1);
-	player.ys = player.ys > 0 ? Math.max(0,player.ys-=0.1) : Math.min(0,player.ys+=0.1);
+	else if(player.onground){
+		player.speed = Math.max(0,player.speed-0.25);
+	}
+	else if(player.up){
+		if(player.left || player.right){
+			if(player.speed > 4){
+				player.speed = Math.max(4,player.speed-0.1);
+			}
+		}
+		else{
+			player.speed = Math.min(12,player.speed+0.05);
+		}
 
-	if(player.up){
-		player.xs += 0.2*Math.cos(player.rot);
-		player.ys += 0.2*Math.sin(player.rot);
-
-		player.xs = Math.max(-4,Math.min(4,player.xs));
-		player.ys = Math.max(-4,Math.min(4,player.ys));
+	}
+	else{
+		player.speed = Math.max(0,player.speed-0.1);
 	}
 
-	ctx.translate(Math.round(player.xs),Math.round(player.ys));
+	if(player.onbeach){
+		if(player.speed > 1){
+			player.speed = Math.max(1,player.speed-1);
+		}
+	}
+
+	player.xs = player.speed*Math.cos(player.rot);
+	player.ys = player.speed*Math.sin(player.rot);
+
+	player.rx = player.rx-player.xs;
+	player.ry = player.ry-player.ys;
+
+	player.x = Math.round(player.rx);
+	player.y = Math.round(player.ry);
+
+
 	drawOptimizedMap(map);
+
+	draw_tri();
+
+	if(player.x > 0 && player.x < map.raw_data.length && player.y > 0 && player.y< map.raw_data[player.x].length){
+		player.onbeach = (map.raw_data[player.x][player.y] >= 0.3) && (map.raw_data[player.x][player.y] < 0.35);
+		player.onground = (map.raw_data[player.x][player.y] >= 0.35);
+	}
+
+
+
 }
 
 
@@ -130,7 +183,7 @@ function drawOptimizedMap(map){
 	for(let c=1;c<map.colours.length;c++){
 		ctx.fillStyle = map.colours[c];
 		for(let p=0;p<map[map.colours[c]].length;p++){
-			ctx.fillRect(map[map.colours[c]][p][0]*map.resolution,map[map.colours[c]][p][1]*map.resolution,1*map.resolution,map[map.colours[c]][p][2]*map.resolution);
+			ctx.fillRect(map[map.colours[c]][p][0]*map.resolution - player.x + MAX_X/2, map[map.colours[c]][p][1]*map.resolution - player.y + MAX_Y/2, 1*map.resolution, map[map.colours[c]][p][2]*map.resolution);
 		}
 	}
 }

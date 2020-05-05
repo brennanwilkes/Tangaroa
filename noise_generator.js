@@ -231,9 +231,9 @@ function gen_island(width, height,seed=Math.round(Math.random()*1000)){
 		}
 	}
 
+	map.raw_data = map;
 	map.seed = seed;
 	map.resolution = RESOLUTION;
 
-	//return [map,mapMASK,motu_noise,reef_noise];
 	return map;
 }

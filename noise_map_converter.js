@@ -12,8 +12,6 @@ function compress(map,factor){
 	const n_x = o_x/factor;
 	const n_y = o_y/factor;
 
-	console.log("Compressing map of size "+o_x+"x"+o_y+" to "+n_x+"x"+n_y);
-
 	let comp = new Array(n_x);
 	for(let i=0;i<n_x;i++){
 		comp[i] = new Array(n_y);
@@ -39,17 +37,20 @@ function compress(map,factor){
 
 	comp.seed = map.seed;
 	comp.resolution = factor;
+	comp.raw_data = map.raw_data;
 
 	return comp;
 }
 
 
 function split_map(map){
-	console.log("Converting data map - "+map.seed);
 
 	let data = new Object();
+
 	data.seed = map.seed;
 	data.resolution = map.resolution;
+
+	data.raw_data = map.raw_data;
 
 	data.colours = ["DarkBlue","#2D5BA4","#297900","#D0AB76"];
 
@@ -85,8 +86,6 @@ function split_map(map){
 }
 
 function optimize(map){
-	console.log("Optimizing map - "+map.seed);
-
 	let temp, strip, amt;
 
 	for(let c=1;c<map.colours.length;c++){
