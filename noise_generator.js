@@ -93,9 +93,45 @@ function ran_b(min_b,max_b){
 	return Math.floor( min_b + Math.random()*(max_b+1) );
 }
 
+function gen_arch(width,height,xIslands,yIslands){
+
+	const size_x = width/xIslands;
+	const size_y = height/yIslands;
+
+	let island;
+	let map = new Array(width);
+	for(let x=0;x<width;x++){
+		map[x] = new Array(height);
+		for(let y=0;y<height;y++){
+			map[x][y] = 0;
+		}
+	}
+	for(let x=0;x<width/size_x;x++){
+		for(let y=0;y<height/size_y;y++){
+
+			island = gen_island(size_x,size_y);
+			for(let xx=0;xx<size_x;xx++){
+				for(let yy=0;yy<size_y;yy++){
+					if(map[x*size_x+xx][y*size_y+yy] != 0){
+						map[x*size_x+xx][y*size_y+yy] = (map[x*size_x+xx][y*size_y+yy] + island[xx][yy]) /2;
+					}
+					else{
+						map[x*size_x+xx][y*size_y+yy] = island[xx][yy];
+					}
+
+				}
+			}
+
+		}
+	}
+
+	return map;
+}
+
 
 //25,8,8,0.75
 function gen_island(width, height,seed=Math.random()*1000){
+	console.log("Generating island "+width+"x"+height+" - "+seed);
 
 	const HAS_MOTU = Math.round(seed)%2 === 0;
 	const HAS_REEF = Math.round(seed)%4 === 0;
@@ -195,7 +231,8 @@ function gen_island(width, height,seed=Math.random()*1000){
 		}
 	}
 
+	map.seed = seed;
 
-
-	return [map,mapMASK,motu_noise,reef_noise];
+	//return [map,mapMASK,motu_noise,reef_noise];
+	return map;
 }
