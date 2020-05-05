@@ -33,7 +33,7 @@ function normalize_map(map){
 	return map;
 }
 
-function gen_noise_map(width, height, scale, oct, persist, lac, seed=Math.random()*1000){
+function gen_noise_map(width, height, scale, oct, persist, lac, seed=Math.round(Math.random()*1000)){
 
 	noise.seed(seed);
 
@@ -130,7 +130,7 @@ function gen_arch(width,height,xIslands,yIslands){
 
 
 //25,8,8,0.75
-function gen_island(width, height,seed=Math.random()*1000){
+function gen_island(width, height,seed=Math.round(Math.random()*1000)){
 	console.log("Generating island "+width+"x"+height+" - "+seed);
 
 	const HAS_MOTU = Math.round(seed)%2 === 0;

@@ -9,6 +9,8 @@ var RESOLUTION = Resolution.high;
 
 var map;
 
+var player;
+
 var resolutionSlider = document.getElementById("resolution");
 resolutionSlider.oninput = function() {
 	RESOLUTION = {"1":Resolution.ultralow,"2":Resolution.low,"3":Resolution.medium,"4":Resolution.high}[this.value];
@@ -20,19 +22,69 @@ function setUp(){
 	canvas.width = MAX_X;
 	canvas.height = MAX_Y;
 
+	player = new Object();
+	player.x = Math.round(MAX_X/2);
+	player.y = Math.round(MAX_Y/2);
+	player.rot = Math.PI/2;
+	player.xs = 0;
+	player.ys = 0;
+
+	player.left = false;
+	player.right = false;
+	player.up = false;
+	player.down = false;
+
+
 
 	map = optimize(split_map(compress(gen_island(1000,1000),RESOLUTION)));
 
 	drawOptimizedMap(map);
+
+	addEventListener("keydown",key_down);
+	addEventListener("keyup",key_up);
+	setInterval(tick,16);
 }
+
+function key_down(event){
+	if(event.key.substring(0,5) === "Arrow"){
+		player[event.key.substring(5).toLowerCase()] = true;
+	}
+}
+function key_up(event){
+	if(event.key.substring(0,5) === "Arrow"){
+		player[event.key.substring(5).toLowerCase()] = false;
+	}
+}
+
+function tick(event){
+	if(player.right){
+		player.rot = (player.rot+(Math.PI/100))%(Math.PI*2);
+	}
+	if(player.left){
+		player.rot = (player.rot-(Math.PI/100))%(Math.PI*2);
+	}
+
+	player.xs = player.xs > 0 ? Math.max(0,player.xs-=0.1) : Math.min(0,player.xs+=0.1);
+	player.ys = player.ys > 0 ? Math.max(0,player.ys-=0.1) : Math.min(0,player.ys+=0.1);
+
+	if(player.up){
+		player.xs += 0.2*Math.cos(player.rot);
+		player.ys += 0.2*Math.sin(player.rot);
+
+		player.xs = Math.max(-4,Math.min(4,player.xs));
+		player.ys = Math.max(-4,Math.min(4,player.ys));
+	}
+
+	ctx.translate(Math.round(player.xs),Math.round(player.ys));
+	drawOptimizedMap(map);
+}
+
 
 function rgb(r,g,b){
 	return "rgb("+r+", "+g+", "+b+")";
 }
 
 function drawDataMap(map){
-	console.log("Rendering map - "+map.seed);
-
 	ctx.fillStyle = "darkblue";
 	ctx.fillRect(0,0,MAX_X,MAX_Y);
 
@@ -60,8 +112,6 @@ function drawDataMap(map){
 }
 
 function drawMap(map){
-	console.log("Rendering map - "+map.seed);
-
 	ctx.fillStyle = map.colours[0];
 	ctx.fillRect(0,0,MAX_X,MAX_Y);
 
@@ -74,8 +124,6 @@ function drawMap(map){
 }
 
 function drawOptimizedMap(map){
-	console.log("Rendering map - "+map.seed);
-
 	ctx.fillStyle = map.colours[0];
 	ctx.fillRect(0,0,MAX_X,MAX_Y);
 
@@ -86,3 +134,5 @@ function drawOptimizedMap(map){
 		}
 	}
 }
+
+//if(keyPressMap["Thrust"])
