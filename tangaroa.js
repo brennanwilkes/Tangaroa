@@ -4,32 +4,33 @@ const MAX_X = Math.max(document.documentElement.clientWidth, window.innerWidth |
 var canvas = document.getElementById("map");
 var ctx = canvas.getContext("2d");
 
+const Resolution = Object.freeze({"ultralow":8,"low":4, "medium":2, "high":1})
+var RESOLUTION = Resolution.high;
+
 var map;
-var map2;
+
+var resolutionSlider = document.getElementById("resolution");
+resolutionSlider.oninput = function() {
+	RESOLUTION = {"1":Resolution.ultralow,"2":Resolution.low,"3":Resolution.medium,"4":Resolution.high}[this.value];
+	map = regenerate(map, RESOLUTION);
+	drawOptimizedMap(map);
+}
 
 function setUp(){
 	canvas.width = MAX_X;
 	canvas.height = MAX_Y;
 
-	noise.seed(Math.random()*1000);
 
+	map = optimize(split_map(compress(gen_island(1000,1000),RESOLUTION)));
 
-	map = gen_island(1000,1000);
-	map2 = compress(map,8);
-	//map2 = gen_island(MAX_X,MAX_Y);
-	//map3 = gen_island(MAX_X,MAX_Y);
-
-
-	//map = gen_arch(MAX_X,MAX_Y,3,2);
-
-	drawMap(map);
+	drawOptimizedMap(map);
 }
 
 function rgb(r,g,b){
 	return "rgb("+r+", "+g+", "+b+")";
 }
 
-function drawMap(map){
+function drawDataMap(map){
 	console.log("Rendering map - "+map.seed);
 
 	ctx.fillStyle = "darkblue";
@@ -54,6 +55,34 @@ function drawMap(map){
 			}
 
 			ctx.fillRect(i,j,1,1);
+		}
+	}
+}
+
+function drawMap(map){
+	console.log("Rendering map - "+map.seed);
+
+	ctx.fillStyle = map.colours[0];
+	ctx.fillRect(0,0,MAX_X,MAX_Y);
+
+	for(let c=1;c<map.colours.length;c++){
+		ctx.fillStyle = map.colours[c];
+		for(let p=0;p<map[map.colours[c]].length;p++){
+			ctx.fillRect(map[map.colours[c]][p][0],map[map.colours[c]][p][1],1,1);
+		}
+	}
+}
+
+function drawOptimizedMap(map){
+	console.log("Rendering map - "+map.seed);
+
+	ctx.fillStyle = map.colours[0];
+	ctx.fillRect(0,0,MAX_X,MAX_Y);
+
+	for(let c=1;c<map.colours.length;c++){
+		ctx.fillStyle = map.colours[c];
+		for(let p=0;p<map[map.colours[c]].length;p++){
+			ctx.fillRect(map[map.colours[c]][p][0]*map.resolution,map[map.colours[c]][p][1]*map.resolution,1*map.resolution,map[map.colours[c]][p][2]*map.resolution);
 		}
 	}
 }
