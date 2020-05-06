@@ -1,6 +1,8 @@
 const MAX_Y = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 const MAX_X = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
+const ISL_DEFAULT_SIZE = 2000;
+
 var canvas = document.getElementById("map");
 var ctx = canvas.getContext("2d");
 
@@ -14,8 +16,14 @@ var player;
 var resolutionSlider = document.getElementById("resolution");
 resolutionSlider.oninput = function() {
 	RESOLUTION = {"1":Resolution.ultralow,"2":Resolution.low,"3":Resolution.medium,"4":Resolution.high}[this.value];
-	map = regenerate(map, RESOLUTION);
-	drawOptimizedMap(map);
+	map.regenerate(RESOLUTION);
+	clear_screen();
+	map.draw(ctx);
+}
+
+function clear_screen(){
+	ctx.fillStyle = map.colours[0];
+	ctx.fillRect(0,0,MAX_X,MAX_Y);
 }
 
 function setUp(){
@@ -41,10 +49,13 @@ function setUp(){
 	player.down = false;
 
 
+	map = new Island(ISL_DEFAULT_SIZE,ISL_DEFAULT_SIZE,Math.random()*1000);
+	//map = optimize(split_map(compress(gen_island(ISL_DEFAULT_SIZE,ISL_DEFAULT_SIZE),RESOLUTION)));
+	//map.x = 0;
+	//map.y = 0;
 
-	map = optimize(split_map(compress(gen_island(1000,1000),RESOLUTION)));
-
-	drawOptimizedMap(map);
+	clear_screen();
+	map.draw(ctx);
 
 	addEventListener("keydown",key_down);
 	addEventListener("keyup",key_up);
@@ -119,7 +130,8 @@ function tick(event){
 	player.y = Math.round(player.ry);
 
 
-	drawOptimizedMap(map);
+	clear_screen();
+	map.draw(ctx);
 
 	draw_tri();
 
@@ -133,59 +145,5 @@ function tick(event){
 }
 
 
-function rgb(r,g,b){
-	return "rgb("+r+", "+g+", "+b+")";
-}
-
-function drawDataMap(map){
-	ctx.fillStyle = "darkblue";
-	ctx.fillRect(0,0,MAX_X,MAX_Y);
-
-	for(let i=0;i<map.length;i++){
-		for(let j=0; j<map[0].length; j++){
-			if(map[i][j]<0.1){
-				continue;
-			}
-			else if(map[i][j]<0.3){
-				ctx.fillStyle = "blue";
-			}
-			else if(map[i][j] < 0.35){
-				ctx.fillStyle = "coral";
-			}
-			else if(map[i][j] < 0.75){
-				ctx.fillStyle = "green";
-			}
-			else{
-				ctx.fillStyle = "grey";
-			}
-
-			ctx.fillRect(i,j,1,1);
-		}
-	}
-}
-
-function drawMap(map){
-	ctx.fillStyle = map.colours[0];
-	ctx.fillRect(0,0,MAX_X,MAX_Y);
-
-	for(let c=1;c<map.colours.length;c++){
-		ctx.fillStyle = map.colours[c];
-		for(let p=0;p<map[map.colours[c]].length;p++){
-			ctx.fillRect(map[map.colours[c]][p][0],map[map.colours[c]][p][1],1,1);
-		}
-	}
-}
-
-function drawOptimizedMap(map){
-	ctx.fillStyle = map.colours[0];
-	ctx.fillRect(0,0,MAX_X,MAX_Y);
-
-	for(let c=1;c<map.colours.length;c++){
-		ctx.fillStyle = map.colours[c];
-		for(let p=0;p<map[map.colours[c]].length;p++){
-			ctx.fillRect(map[map.colours[c]][p][0]*map.resolution - player.x + MAX_X/2, map[map.colours[c]][p][1]*map.resolution - player.y + MAX_Y/2, 1*map.resolution, map[map.colours[c]][p][2]*map.resolution);
-		}
-	}
-}
 
 //if(keyPressMap["Thrust"])
