@@ -17,8 +17,7 @@ var resolutionSlider = document.getElementById("resolution");
 resolutionSlider.oninput = function() {
 	RESOLUTION = {"1":Resolution.ultralow,"2":Resolution.low,"3":Resolution.medium,"4":Resolution.high}[this.value];
 	map.regenerate(RESOLUTION);
-	clear_screen();
-	map.draw(ctx);
+	draw_screen();
 }
 
 function clear_screen(){
@@ -50,12 +49,8 @@ function setUp(){
 
 
 	map = new Island(ISL_DEFAULT_SIZE,ISL_DEFAULT_SIZE,Math.random()*1000);
-	//map = optimize(split_map(compress(gen_island(ISL_DEFAULT_SIZE,ISL_DEFAULT_SIZE),RESOLUTION)));
-	//map.x = 0;
-	//map.y = 0;
 
-	clear_screen();
-	map.draw(ctx);
+
 
 	addEventListener("keydown",key_down);
 	addEventListener("keyup",key_up);
@@ -86,6 +81,15 @@ function draw_tri(){
 	ctx.lineTo(-10, 0);
 	ctx.fill();
 	ctx.restore();
+}
+
+function draw_screen(){
+	clear_screen();
+	ctx.save();
+	ctx.translate(player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
+	map.draw(ctx);
+	ctx.restore();
+	draw_tri();
 }
 
 function tick(event){
@@ -130,20 +134,10 @@ function tick(event){
 	player.y = Math.round(player.ry);
 
 
-	clear_screen();
-	map.draw(ctx);
-
-	draw_tri();
-
-	if(player.x > 0 && player.x < map.raw_data.length && player.y > 0 && player.y< map.raw_data[player.x].length){
-		player.onbeach = (map.raw_data[player.x][player.y] >= 0.3) && (map.raw_data[player.x][player.y] < 0.35);
-		player.onground = (map.raw_data[player.x][player.y] >= 0.35);
-	}
+	draw_screen()
 
 
+	player.onbeach = map.onbeach(player.x,player.y);
+	player.onground = map.onground(player.x,player.y);
 
 }
-
-
-
-//if(keyPressMap["Thrust"])

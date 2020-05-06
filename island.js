@@ -330,4 +330,12 @@ class Island{
 		}
 	}
 
+	onbeach(x,y){
+		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[x][y] >= 0.3) && (this.raw_data[x][y] < 0.35);
+	}
+
+	onground(x, y){
+		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[x][y] >= 0.35);
+	}
+
 }
