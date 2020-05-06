@@ -18,8 +18,8 @@ const Resolution = Object.freeze({"ultralow":8,"low":4, "medium":2, "high":1})
 var RESOLUTION = Resolution.low;
 
 var map;
-
 var player;
+var intervalID;
 
 var resolutionSlider = document.getElementById("resolution");
 resolutionSlider.oninput = function() {
@@ -47,6 +47,10 @@ function setUp(){
 	player.ys = 0;
 	player.speed = 0;
 
+	player.img = new Image();
+	player.img.src = "canoe.png";
+
+
 	player.onbeach = false;
 	player.onground = false;
 
@@ -56,14 +60,12 @@ function setUp(){
 	player.down = false;
 
 
-	map = generate_random_island();
+	map = generate_random_island(0);
 	map.regenerate(RESOLUTION);
-
-
 
 	addEventListener("keydown",key_down);
 	addEventListener("keyup",key_up);
-	setInterval(tick,16);
+	intervalID = setInterval(tick,16);
 }
 
 function key_down(event){
@@ -77,25 +79,26 @@ function key_up(event){
 	}
 }
 
-function draw_tri(){
-	ctx.save();
-	ctx.fillStyle = "brown";
-	ctx.translate(MAX_X/2,MAX_Y/2);
-	ctx.rotate(player.rot);
-	ctx.rotate(Math.PI*-0.5);
-	ctx.beginPath();
-
-	ctx.lineTo(10, 0);
-	ctx.lineTo(0, -10);
-	ctx.lineTo(-10, 0);
-	ctx.fill();
-	ctx.restore();
-}
 
 function draw_screen(){
 	clear_screen();
 	map.draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
-	draw_tri();
+
+	ctx.save();
+	ctx.translate(MAX_X/2,MAX_Y/2);
+	ctx.scale(0.05,0.05);
+
+	ctx.translate(player.img.width*0.025,player.img.height*0.025);
+
+
+	ctx.rotate(player.rot);
+	ctx.rotate(Math.PI*-0.5);
+
+	ctx.translate(player.img.width/-2,player.img.height/-2);
+
+
+	ctx.drawImage(player.img, 0, 0);
+	ctx.restore();
 }
 
 function tick(event){
