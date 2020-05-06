@@ -56,7 +56,7 @@ function setUp(){
 	player.down = false;
 
 
-	map = new Island();
+	map = generate_random_island();
 	map.regenerate(RESOLUTION);
 
 

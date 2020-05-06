@@ -127,16 +127,28 @@ let SMALL_SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408];
 
 let SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920, 2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072];
 
-let ARC_SIZES = [2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072, 3200, 3328, 3456, 3584, 3712, 3840, 3968, 4096, 4224, 4352, 4480, 4608, 4736, 4864, 4992];
+let CLUSTER_SIZES = [2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072, 3200, 3328, 3456, 3584, 3712, 3840, 3968, 4096, 4224, 4352, 4480, 4608, 4736, 4864, 4992];
+
+function generate_random_island(type=-1, seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0){
+	if(type === -1){
+		type = hash(seed+5)%2;
+	}
+	if(type === 0){
+		return new Island();
+	}
+	else if(type === 1){
+		return new IslandCluster();
+	}
+}
 
 
 class Island{
-	constructor(type=-1, seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0, LAC_SCALE_DOWN=1) {
+	constructor(type=0, seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0, LAC_SCALE_DOWN=1) {
 
 		this.replicable_seed = seed;
 		this.seed = hash(seed);
 
-		this.type = type===-1 ? hash(seed+5)%2 : type;
+		this.type = type;
 
 		this.x = x;
 		this.y = y;
@@ -144,7 +156,7 @@ class Island{
 		this.resolution = 1;
 
 		this.size = [size_x,size_y];
-		const size_type = [SIZES,ARC_SIZES];
+		const size_type = [SIZES,CLUSTER_SIZES];
 		if(this.size[0] === -1){
 			this.size[0] = size_type[this.type][hash(seed)%size_type[this.type].length];
 		}
@@ -159,17 +171,12 @@ class Island{
 		this.LAC_SCALE_DOWN = LAC_SCALE_DOWN;
 
 		this.raw_data;
+		this.display_data;
 
 		if(this.type === 0){
 			this.gen_island_data();
+			this.gen_display_data(this.compress(this.resolution));
 		}
-		else if(this.type === 1){
-			this.gen_arc_data();
-		}
-
-
-		this.display_data;
-		this.gen_display_data(this.compress(this.resolution));
 	}
 
 	compress(factor){
@@ -267,53 +274,7 @@ class Island{
 		this.gen_display_data(this.compress(resolution));
 	}
 
-	gen_arc_data(){
 
-		console.log("generating cluster",this.size[0]+"x"+this.size[0],this.replicable_seed);
-
-		this.raw_data = new Array(this.size[0]);
-		for(let i=0; i<this.size[0]; i++){
-			this.raw_data[i] = new Array(this.size[1]);
-			for(let j=0; j<this.size[1]; j++){
-				this.raw_data[i][j] = 0;
-			}
-		}
-
-		let island, size, x, y, valid, tries;
-		let max = 32+(hash(this.seed-10)%Math.round(this.size[0]/512));
-		for(let isl = 0; isl < max; isl++){
-			size = SMALL_SIZES[hash(this.seed*isl+this.size[0])%SMALL_SIZES.length];
-			island = new Island(0, hash(this.seed*isl), size, size, 0, 0, 0.925);
-
-			valid = false;
-			tries = 0;
-			while(!valid){
-
-				if(tries>500){
-					break;
-				}
-
-				x = hash(this.seed*isl-1)%(this.size[0]-island.size[0]);
-				y = hash(this.seed*isl-2)%(this.size[1]-island.size[1]);
-
-				valid = true;
-
-				//replace 0.2 and 0.8 with calculations
-				for(let i=Math.round(x+island.size[0]*0.2);i<x+island.size[0]*0.8; i += 16){
-					for(let j=Math.round(y+island.size[1]*0.2);j<y+island.size[1]*0.8; j += 16){
-						if(this.raw_data[i][j] >= 0.1){
-							valid = false;
-							break;
-						}
-					}
-					tries++;
-				}
-			}
-			if(valid){
-				this.blend(island,x,y);
-			}
-		}
-	}
 
 	blend(island,x,y){
 		for(let i=0; i<island.size[0]; i++){
@@ -429,7 +390,6 @@ class Island{
 		ctx.save();
 		ctx.translate(offsetx, offsety);
 
-
 		for(let c=1;c<this.colours.length;c++){
 			ctx.fillStyle = this.colours[c];
 
@@ -439,9 +399,6 @@ class Island{
 		}
 		ctx.restore();
 	}
-
-
-
 	onbeach(x,y){
 		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[x][y] >= 0.3) && (this.raw_data[x][y] < 0.35);
 	}
@@ -449,5 +406,62 @@ class Island{
 	onground(x, y){
 		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[x][y] >= 0.35);
 	}
+}
 
+
+class IslandCluster extends Island{
+	constructor(seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0, LAC_SCALE_DOWN=1) {
+		super(1,seed,size_x,size_y,x,y,LAC_SCALE_DOWN);
+
+		this.gen_cluster_data();
+		this.gen_display_data(this.compress(this.resolution));
+	}
+
+	gen_cluster_data(){
+
+		console.log("generating cluster",this.size[0]+"x"+this.size[0],this.replicable_seed);
+
+		this.raw_data = new Array(this.size[0]);
+		for(let i=0; i<this.size[0]; i++){
+			this.raw_data[i] = new Array(this.size[1]);
+			for(let j=0; j<this.size[1]; j++){
+				this.raw_data[i][j] = 0;
+			}
+		}
+
+		let island, size, x, y, valid, tries;
+		let max = 32+(hash(this.seed-10)%Math.round(this.size[0]/512));
+		for(let isl = 0; isl < max; isl++){
+			size = SMALL_SIZES[hash(this.seed*isl+this.size[0])%SMALL_SIZES.length];
+			island = new Island(0, hash(this.seed*isl), size, size, 0, 0, 0.925);
+
+			valid = false;
+			tries = 0;
+			while(!valid){
+
+				if(tries>500){
+					break;
+				}
+
+				x = hash(this.seed*isl-1)%(this.size[0]-island.size[0]);
+				y = hash(this.seed*isl-2)%(this.size[1]-island.size[1]);
+
+				valid = true;
+
+				//replace 0.2 and 0.8 with calculations
+				for(let i=Math.round(x+island.size[0]*0.2);i<x+island.size[0]*0.8; i += 16){
+					for(let j=Math.round(y+island.size[1]*0.2);j<y+island.size[1]*0.8; j += 16){
+						if(this.raw_data[i][j] >= 0.1){
+							valid = false;
+							break;
+						}
+					}
+					tries++;
+				}
+			}
+			if(valid){
+				this.blend(island,x,y);
+			}
+		}
+	}
 }
