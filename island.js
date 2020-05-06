@@ -122,11 +122,11 @@ class Island{
 		this.colours = ["DarkBlue","#2D5BA4","#297900","#D0AB76"];
 
 		this.raw_data;
-		this.gen_island_data()
+		this.gen_island_data();
 
 		this.display_data;
+		this.scaled_raw_data;
 		this.gen_display_data(this.compress(this.resolution));
-		this.optimize_display_data();
 	}
 
 	compress(factor){
@@ -164,6 +164,11 @@ class Island{
 
 	gen_display_data(raw_data){
 
+		this.scaled_raw_data = new Array(this.size[0]);
+		for(let i=0;i<this.size[0];i++){
+			this.scaled_raw_data[i] = new Array(this.size[1]);
+		}
+
 		this.display_data = new Array();
 
 		//lightblue
@@ -177,6 +182,16 @@ class Island{
 
 		for(let x=0;x<raw_data.length;x++){
 			for(let y=0;y<raw_data[0].length;y++){
+
+				//record scaled raw data
+				for(let xx=0;xx<this.resolution;xx++){
+					for(let yy=0;yy<this.resolution;yy++){
+						if(this.scaled_raw_data==undefined) console.log('scaled raw')
+						if(this.scaled_raw_data[x*this.resolution+xx]==undefined) console.log(x,this.resolution,xx)
+						this.scaled_raw_data[x*this.resolution+xx][y*this.resolution+yy] = raw_data[x][y];
+					}
+				}
+
 				if(raw_data[x][y]<0.1){
 					continue;
 				}
@@ -191,6 +206,8 @@ class Island{
 				}
 			}
 		}
+
+		this.optimize_display_data();
 	}
 
 	optimize_display_data(){
@@ -217,9 +234,8 @@ class Island{
 		}
 	}
 	regenerate(resolution){
-		this.gen_display_data(this.compress(resolution));
-		this.optimize_display_data();
 		this.resolution = resolution;
+		this.gen_display_data(this.compress(resolution));
 	}
 
 
@@ -318,9 +334,56 @@ class Island{
 		}
 	}
 
+	drawImageData(ctx, offsetx, offsety){
+
+		let screenx = ctx.canvas.clientWidth;
+		let screeny = ctx.canvas.clientHeight;
+
+		if(offsetx*-1 >= screenx || offsety*-1 >= screeny || offsetx >= this.size[0] || offsety >= this.size[1]){
+			return;
+		}
+
+		let imageData = ctx.getImageData(Math.max(0,offsetx*-1),Math.max(0,offsety*-1),Math.min(screenx,this.size[0]-offsetx) - Math.max(0,offsetx*-1),Math.min(screeny,this.size[1]-offsety) - Math.max(0,offsety*-1));
+
+		let data = imageData.data;
+		let index, i, j, x, y;
+		for( i = Math.max(offsetx,0), x=0; i < Math.min(screenx+offsetx, this.size[0]); i++, x++){
+			for( j = Math.max(offsety,0), y=0; j < Math.min(screeny+offsety, this.size[1]); j++, y++){
+
+				index = (y * Math.min(screenx+offsetx, this.size[0]) + x) * 4;
+
+				if(this.scaled_raw_data[i][j]<0.1){
+					continue;
+				}
+				else if(this.scaled_raw_data[i][j] < 0.3){
+					data[index] =45;
+					data[index+1] =91;
+					data[index+2] =164;
+				}
+				else if(this.scaled_raw_data[i][j] < 0.35){
+					data[index] = 208;
+					data[index+1] =171;
+					data[index+2] =118;
+				}
+				else{
+					data[index] =41;
+					data[index+1] =121;
+					data[index+2] =0;
+				}
+				data[index+3] = 255;
+			}
+		}
 
 
-	draw(ctx){
+		ctx.putImageData(imageData, Math.max(0,offsetx*-1),Math.max(0,offsety*-1));
+	}
+
+	draw(ctx, offsetx, offsety){
+
+		ctx.save();
+		ctx.translate(offsetx, offsety);
+
+
 		for(let c=1;c<this.colours.length;c++){
 			ctx.fillStyle = this.colours[c];
 
@@ -328,7 +391,11 @@ class Island{
 				ctx.fillRect(this.display_data[this.colours[c]][p][0]*this.resolution, this.display_data[this.colours[c]][p][1]*this.resolution, this.resolution, this.display_data[this.colours[c]][p][2]*this.resolution);
 			}
 		}
+
+		ctx.restore();
 	}
+
+
 
 	onbeach(x,y){
 		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[x][y] >= 0.3) && (this.raw_data[x][y] < 0.35);

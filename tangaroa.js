@@ -85,10 +85,7 @@ function draw_tri(){
 
 function draw_screen(){
 	clear_screen();
-	ctx.save();
-	ctx.translate(player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
-	map.draw(ctx);
-	ctx.restore();
+	map.draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 	draw_tri();
 }
 
