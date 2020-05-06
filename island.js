@@ -39,7 +39,7 @@ function normalize_2d_array(arr,minHeight,maxHeight){
 
 
 
-function gen_noise_map(width, height, scale, oct, persist, lac, seed=Math.round(Math.random()*1000)){
+function gen_noise_map(width, height, scale, oct, persist, lac, seed){
 	noise.seed(seed);
 
 	let xx,yy;
@@ -88,6 +88,18 @@ function rgb(r,g,b){
 }
 
 
+function hash(num){
+	let hash = 0x12345678;
+
+	while (num > 0) {
+		hash ^= (hash << 16) | (hash << 19);
+		hash += num % 10;
+		hash ^= (hash << 26) | (hash << 13);
+		num = num / 10;
+	}
+	return Math.abs(hash);
+}
+
 
 //-------------------------------------ISLAND CLASS------------------------------------------
 
@@ -110,14 +122,20 @@ const ISL_OCT = 8;
 const ISL_PERSIST = 2;
 const ISL_LAC = 0.75;
 
+let SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920, 2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072];
+
 
 class Island{
-	constructor(size_x, size_y, seed, x=0, y=0) {
+	constructor(seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0) {
+
+		this.replicable_seed = seed;
+		this.seed = hash(seed);
+
 		this.x = x;
 		this.y = y;
-		this.size = [size_x, size_y];
-		this.seed = seed;
+
 		this.resolution = 1;
+		this.size = [size_x === -1 ? SIZES[hash(seed)%SIZES.length] : size_x, size_y === -1 ? SIZES[hash(seed)%SIZES.length] : size_y];
 
 		this.colours = ["DarkBlue","#2D5BA4","#297900","#D0AB76"];
 
@@ -226,11 +244,11 @@ class Island{
 
 	//25,8,8,0.75
 	gen_island_data(){
-		const HAS_MOTU = Math.round(this.seed)%2 === 0;
-		const HAS_REEF = Math.round(this.seed)%4 === 0;
+		const HAS_MOTU = this.seed%2 === 0;
+		const HAS_REEF = this.seed%4 === 0;
 
 		//generate base map
-		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,ISL_LAC,this.seed);
+		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,ISL_LAC,hash(this.seed));
 
 		//Raise the height
 		this.raw_data = normalize_2d_array(this.raw_data,-0.5,1);
@@ -243,15 +261,15 @@ class Island{
 		let motu_noise, reef_noise;
 
 		if(HAS_MOTU){
-			motu_noise =  gen_noise_map(this.size[0], this.size[1], MOTU_SCALE,MOTU_OCT,MOTU_PERSIST,MOTU_LAC,this.seed+1);
+			motu_noise =  gen_noise_map(this.size[0], this.size[1], MOTU_SCALE,MOTU_OCT,MOTU_PERSIST,MOTU_LAC,hash(this.seed+1));
 			motu_noise = normalize_2d_array(motu_noise,-2,1);
 
 			if(HAS_REEF){
-				reef_noise =  gen_noise_map(this.size[0], this.size[1], REEF_SCALE,REEF_OCT,REEF_PERSIST,REEF_LAC,this.seed+1);
+				reef_noise =  gen_noise_map(this.size[0], this.size[1], REEF_SCALE,REEF_OCT,REEF_PERSIST,REEF_LAC,hash(this.seed+2));
 			}
 		}
 
-		let seed_scale = normalize(Math.round(this.seed)%250+750,0,1000);
+		let seed_scale = normalize(hash(this.seed+3)%250+750,0,1000);
 
 		for(let x=0;x<this.size[0];x++){
 			mapMASK[x] = new Array(this.size[1]);

@@ -1,3 +1,11 @@
+/*
+
+	COOL SEEDS
+	
+
+*/
+
+
 const MAX_Y = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 const MAX_X = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
@@ -7,7 +15,7 @@ var canvas = document.getElementById("map");
 var ctx = canvas.getContext("2d");
 
 const Resolution = Object.freeze({"ultralow":8,"low":4, "medium":2, "high":1})
-var RESOLUTION = Resolution.high;
+var RESOLUTION = Resolution.low;
 
 var map;
 
@@ -48,7 +56,8 @@ function setUp(){
 	player.down = false;
 
 
-	map = new Island(ISL_DEFAULT_SIZE,ISL_DEFAULT_SIZE,Math.random()*1000);
+	map = new Island();
+	map.regenerate(RESOLUTION);
 
 
 
