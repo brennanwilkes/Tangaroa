@@ -120,7 +120,7 @@ const REEF_LAC = 0.95;
 const ISL_SCALE = 25;
 const ISL_OCT = 8;
 const ISL_PERSIST = 2;
-const ISL_LAC = 0.75;
+const ISL_LAC = 0.725;
 
 let SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920, 2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072];
 
@@ -136,6 +136,7 @@ class Island{
 
 		this.resolution = 1;
 		this.size = [size_x === -1 ? SIZES[hash(seed)%SIZES.length] : size_x, size_y === -1 ? SIZES[hash(seed)%SIZES.length] : size_y];
+		this.size.push(normalize((this.size[0]+this.size[1])/2,SIZES[0],SIZES[SIZES.length-1]));
 
 		this.colours = ["DarkBlue","#2D5BA4","#297900","#D0AB76"];
 
@@ -248,7 +249,7 @@ class Island{
 		const HAS_REEF = this.seed%4 === 0;
 
 		//generate base map
-		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,ISL_LAC,hash(this.seed));
+		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,ISL_LAC + 0.15*(1-this.size[2]),hash(this.seed));
 
 		//Raise the height
 		this.raw_data = normalize_2d_array(this.raw_data,-0.5,1);
