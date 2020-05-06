@@ -120,28 +120,53 @@ const REEF_LAC = 0.95;
 const ISL_SCALE = 25;
 const ISL_OCT = 8;
 const ISL_PERSIST = 2;
-const ISL_LAC = 0.725;
+const ISL_LAC = 0.7;
+
+
+let SMALL_SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408];
 
 let SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920, 2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072];
 
+let ARC_SIZES = [2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072, 3200, 3328, 3456, 3584, 3712, 3840, 3968, 4096, 4224, 4352, 4480, 4608, 4736, 4864, 4992];
+
 
 class Island{
-	constructor(seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0) {
+	constructor(type=-1, seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0, LAC_SCALE_DOWN=1) {
 
 		this.replicable_seed = seed;
 		this.seed = hash(seed);
+
+		this.type = type===-1 ? hash(seed+5)%2 : type;
 
 		this.x = x;
 		this.y = y;
 
 		this.resolution = 1;
-		this.size = [size_x === -1 ? SIZES[hash(seed)%SIZES.length] : size_x, size_y === -1 ? SIZES[hash(seed)%SIZES.length] : size_y];
+
+		this.size = [size_x,size_y];
+		const size_type = [SIZES,ARC_SIZES];
+		if(this.size[0] === -1){
+			this.size[0] = size_type[this.type][hash(seed)%size_type[this.type].length];
+		}
+		if(this.size[1] === -1){
+			this.size[1] = size_type[this.type][hash(seed)%size_type[this.type].length];
+		}
+
 		this.size.push(normalize((this.size[0]+this.size[1])/2,SIZES[0],SIZES[SIZES.length-1]));
 
 		this.colours = ["DarkBlue","#2D5BA4","#297900","#D0AB76"];
 
+		this.LAC_SCALE_DOWN = LAC_SCALE_DOWN;
+
 		this.raw_data;
-		this.gen_island_data();
+
+		if(this.type === 0){
+			this.gen_island_data();
+		}
+		else if(this.type === 1){
+			this.gen_arc_data();
+		}
+
 
 		this.display_data;
 		this.gen_display_data(this.compress(this.resolution));
@@ -242,14 +267,75 @@ class Island{
 		this.gen_display_data(this.compress(resolution));
 	}
 
+	gen_arc_data(){
+
+		console.log("generating cluster",this.size[0]+"x"+this.size[0],this.replicable_seed);
+
+		this.raw_data = new Array(this.size[0]);
+		for(let i=0; i<this.size[0]; i++){
+			this.raw_data[i] = new Array(this.size[1]);
+			for(let j=0; j<this.size[1]; j++){
+				this.raw_data[i][j] = 0;
+			}
+		}
+
+		let island, size, x, y, valid, tries;
+		let max = 32+(hash(this.seed-10)%Math.round(this.size[0]/512));
+		for(let isl = 0; isl < max; isl++){
+			size = SMALL_SIZES[hash(this.seed*isl+this.size[0])%SMALL_SIZES.length];
+			island = new Island(0, hash(this.seed*isl), size, size, 0, 0, 0.925);
+
+			valid = false;
+			tries = 0;
+			while(!valid){
+
+				if(tries>500){
+					break;
+				}
+
+				x = hash(this.seed*isl-1)%(this.size[0]-island.size[0]);
+				y = hash(this.seed*isl-2)%(this.size[1]-island.size[1]);
+
+				valid = true;
+
+				//replace 0.2 and 0.8 with calculations
+				for(let i=Math.round(x+island.size[0]*0.2);i<x+island.size[0]*0.8; i += 16){
+					for(let j=Math.round(y+island.size[1]*0.2);j<y+island.size[1]*0.8; j += 16){
+						if(this.raw_data[i][j] >= 0.1){
+							valid = false;
+							break;
+						}
+					}
+					tries++;
+				}
+			}
+			if(valid){
+				this.blend(island,x,y);
+			}
+		}
+	}
+
+	blend(island,x,y){
+		for(let i=0; i<island.size[0]; i++){
+			for(let j=0; j<island.size[1]; j++){
+				if(island.raw_data[i][j] > 0.1){
+					this.raw_data[x+i][y+j] = island.raw_data[i][j];
+				}
+			}
+		}
+	}
+
 
 	//25,8,8,0.75
 	gen_island_data(){
+
+		console.log("generating island",this.size[0]+"x"+this.size[0],this.replicable_seed);
+
 		const HAS_MOTU = this.seed%2 === 0;
 		const HAS_REEF = this.seed%4 === 0;
 
 		//generate base map
-		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,ISL_LAC + 0.15*(1-this.size[2]),hash(this.seed));
+		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,(ISL_LAC + 0.15*(1-this.size[2]))*this.LAC_SCALE_DOWN,hash(this.seed));
 
 		//Raise the height
 		this.raw_data = normalize_2d_array(this.raw_data,-0.5,1);
@@ -351,7 +437,6 @@ class Island{
 				ctx.fillRect(this.display_data[this.colours[c]][p][0]*this.resolution, this.display_data[this.colours[c]][p][1]*this.resolution, this.resolution, this.display_data[this.colours[c]][p][2]*this.resolution);
 			}
 		}
-
 		ctx.restore();
 	}
 
