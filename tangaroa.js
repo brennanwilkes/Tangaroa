@@ -61,7 +61,7 @@ function setUp(){
 
 
 	let settings = new IslandSettings();
-	settings.type = 1;
+	settings.type = 0;
 	map = generate_random_island(settings);
 	map.regenerate(RESOLUTION);
 
@@ -138,7 +138,7 @@ function tick(event){
 
 		if(!map.visted){
 			if(map.attown(player.x,player.y)){
-				console.log("Welcome to "+map.replicable_seed);
+				console.log("Welcome to "+map.name);
 				map.visted = true;
 			}
 		}

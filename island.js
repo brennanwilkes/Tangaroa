@@ -167,6 +167,7 @@ class Island{
 		this.visited = false;
 
 		this.has_volcano = false;
+		this.name = NAMES_LIST[hash(seed*seed)%NAMES_LIST.length];
 
 		this.x = x;
 		this.y = y;
@@ -185,7 +186,7 @@ class Island{
 
 		this.size.push(normalize((this.size[0]+this.size[1])/2,SIZES[0],SIZES[SIZES.length-1]));
 
-		this.colours = ["DarkBlue","#2D5BA4","#297900","#145900","#093900","#D0AB76","#654321","slategrey","darkred","orange"];
+		this.colours = ["DarkBlue","#2D5BA4","#297900","#145900","#093900","#D0AB76","#654321","slategrey","#222222","darkred","orange"];
 
 		this.LAC_SCALE_DOWN = LAC_SCALE_DOWN;
 		this.GEN_TOWN = GEN_TOWN;
@@ -256,6 +257,7 @@ class Island{
 
 		//mountain
 		this.display_data["slategrey"] = new Array();
+		this.display_data["#222222"] = new Array();
 
 		//volcano
 		this.display_data["darkred"] = new Array();
@@ -284,6 +286,9 @@ class Island{
 				}
 				else if(raw_data[x][y] < 0.75){
 					this.display_data["#093900"].push([x,y]);
+				}
+				else if(raw_data[x][y] < 0.9 && raw_data[x][y] > 0.89){
+					this.display_data["#222222"].push([x,y]);
 				}
 				else if(raw_data[x][y] < 0.925){
 					this.display_data["slategrey"].push([x,y]);
@@ -553,11 +558,14 @@ class IslandCluster extends Island{
 			}
 		}
 
-		let island, size, x, y, valid, tries;
+		let island, size_x, size_y, x, y, valid, tries, temp;
 		let max = 16;
 		for(let isl = 0; isl < max; isl++){
-			size = SMALL_SIZES[hash(this.seed*isl+this.size[0])%SMALL_SIZES.length];
-			island = new Island(0, hash(this.seed*isl), size, size, 0, 0, 0.925, this.town[0]===-1 ? 0 : 1);
+			temp = hash(this.seed*isl)%SMALL_SIZES.length;
+			size_x = SMALL_SIZES[temp + (temp+3 >= SMALL_SIZES.length ? 0 : hash(this.seed*isl+2)%4)];
+			size_y = SMALL_SIZES[temp + (temp+3 >= SMALL_SIZES.length ? 0 : hash(this.seed*isl+1)%4)];
+
+			island = new Island(0, hash(this.seed*isl), size_x, size_y, 0, 0, 0.925, this.town[0]===-1 ? 0 : 1);
 
 			valid = false;
 			tries = 0;
