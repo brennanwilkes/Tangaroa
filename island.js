@@ -561,6 +561,7 @@ class IslandCluster extends Island{
 		let island, size_x, size_y, x, y, valid, tries, temp;
 		let max = 16;
 		for(let isl = 0; isl < max; isl++){
+			document.title = "Loading - "+(isl+1)+"/16";
 			temp = hash(this.seed*isl)%SMALL_SIZES.length;
 			size_x = SMALL_SIZES[temp + (temp+3 >= SMALL_SIZES.length ? 0 : hash(this.seed*isl+2)%4)];
 			size_y = SMALL_SIZES[temp + (temp+3 >= SMALL_SIZES.length ? 0 : hash(this.seed*isl+1)%4)];
@@ -602,5 +603,6 @@ class IslandCluster extends Island{
 				this.blend(island,x,y);
 			}
 		}
+		document.title = "Tangaroa";
 	}
 }
