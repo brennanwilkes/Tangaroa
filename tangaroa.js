@@ -42,7 +42,7 @@ function setUp(){
 	player.ry = 0;
 	player.x = 0;
 	player.y = 0;
-	player.rot = Math.PI/2;
+	player.rot = 5/4*Math.PI;
 	player.xs = 0;
 	player.ys = 0;
 	player.speed = 0;
