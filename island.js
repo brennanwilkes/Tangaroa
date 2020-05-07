@@ -345,7 +345,6 @@ class Island{
 			this.LAC_SCALE_DOWN = 0.8;
 		}
 
-
 		//generate base map
 		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,(ISL_LAC + 0.15*(1-this.size[2]))*this.LAC_SCALE_DOWN,hash(this.seed));
 
@@ -353,7 +352,7 @@ class Island{
 			//Lower the height
 			this.raw_data = normalize_2d_array(this.raw_data, 0, 1.75);
 		}
-		else{
+		else if(this.size[0] >= 512){
 			//Raise the height
 			this.raw_data = normalize_2d_array(this.raw_data, -0.5, 1);
 		}
