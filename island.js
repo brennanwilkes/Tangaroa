@@ -173,7 +173,7 @@ class Island{
 
 		this.size.push(normalize((this.size[0]+this.size[1])/2,SIZES[0],SIZES[SIZES.length-1]));
 
-		this.colours = ["DarkBlue","#2D5BA4","#297900","#D0AB76","#654321"];
+		this.colours = ["DarkBlue","#2D5BA4","#297900","#145900","#093900","#D0AB76","#654321","slategrey","darkred","orange"];
 
 		this.LAC_SCALE_DOWN = LAC_SCALE_DOWN;
 		this.GEN_TOWN = GEN_TOWN;
@@ -230,11 +230,24 @@ class Island{
 		//green
 		this.display_data["#297900"] = new Array();
 
+		//green
+		this.display_data["#145900"] = new Array();
+
+		//green
+		this.display_data["#093900"] = new Array();
+
 		//beach
 		this.display_data["#D0AB76"] = new Array();
 
 		//town
 		this.display_data["#654321"] = new Array();
+
+		//mountain
+		this.display_data["slategrey"] = new Array();
+
+		//volcano
+		this.display_data["darkred"] = new Array();
+		this.display_data["orange"] = new Array();
 
 		for(let x=0;x<raw_data.length;x++){
 			for(let y=0;y<raw_data[0].length;y++){
@@ -251,8 +264,23 @@ class Island{
 				else if(raw_data[x][y] === TOWN_HEIGHT){
 					this.display_data["#654321"].push([x,y]);
 				}
-				else{
+				else if(raw_data[x][y] < 0.45){
 					this.display_data["#297900"].push([x,y]);
+				}
+				else if(raw_data[x][y] < 0.6){
+					this.display_data["#145900"].push([x,y]);
+				}
+				else if(raw_data[x][y] < 0.75){
+					this.display_data["#093900"].push([x,y]);
+				}
+				else if(raw_data[x][y] < 0.925){
+					this.display_data["slategrey"].push([x,y]);
+				}
+				else if(raw_data[x][y] < 1.1){
+					this.display_data["darkred"].push([x,y]);
+				}
+				else{
+					this.display_data["orange"].push([x,y]);
 				}
 			}
 		}
@@ -308,14 +336,27 @@ class Island{
 
 		const HAS_MOTU = this.seed%2 === 0;
 		const HAS_REEF = this.seed%4 === 0;
+		const IS_ATOLL = this.seed%2 === 0 && hash(this.seed-100)%8 === 0;
+		const IS_VOLCANO = this.seed%2 === 1 && hash(this.seed-66)%4 === 0;
+
 		let HAS_TOWN = this.GEN_TOWN === 0 ? hash(this.seed+11)%2 : 1;
+
+		if(IS_VOLCANO || IS_ATOLL){
+			this.LAC_SCALE_DOWN = 0.8;
+		}
+
 
 		//generate base map
 		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,(ISL_LAC + 0.15*(1-this.size[2]))*this.LAC_SCALE_DOWN,hash(this.seed));
 
-		//Raise the height
-		this.raw_data = normalize_2d_array(this.raw_data,-0.5,1);
-
+		if(IS_ATOLL){
+			//Lower the height
+			this.raw_data = normalize_2d_array(this.raw_data, 0, 1.75);
+		}
+		else{
+			//Raise the height
+			this.raw_data = normalize_2d_array(this.raw_data, -0.5, 1);
+		}
 
 
 		let mapMASK = new Array(this.size[0]);
@@ -379,17 +420,11 @@ class Island{
 						this.raw_data[x][y] += motu_noise[x][y]*0.2;
 					}
 
-
 					//apply reef
 					if(HAS_REEF){
 						if(mapMASK[x][y] === 0.25){
 							this.raw_data[x][y] += reef_noise[x][y] > 0.55 ? 0.15 : 0;
 						}
-					}
-
-					//normalize deep water
-					if(this.raw_data[x][y]<0.1){
-						this.raw_data[x][y] = 0.05;
 					}
 
 					//raise water inside motus
@@ -401,6 +436,16 @@ class Island{
 					else if(mapMASK[x][y] === 0.5 && this.raw_data[x][y]<0.275){
 						this.raw_data[x][y]=0.05;
 					}
+				}
+				else if(IS_VOLCANO){
+					if(this.raw_data[x][y]>0.4){
+						this.raw_data[x][y] *= 1.5;
+					}
+				}
+
+				//normalize deep water
+				if(this.raw_data[x][y]<0.1){
+					this.raw_data[x][y] = 0.05;
 				}
 
 				if(HAS_TOWN === 0){

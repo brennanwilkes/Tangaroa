@@ -60,7 +60,7 @@ function setUp(){
 	player.down = false;
 
 
-	map = generate_random_island(0);
+	map = generate_random_island(1);
 	map.regenerate(RESOLUTION);
 
 	addEventListener("keydown",key_down);
