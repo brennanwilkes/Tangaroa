@@ -61,9 +61,7 @@ function setUp(){
 
 
 	let settings = new IslandSettings();
-	settings.type = 0;
-	settings.size_x = 1000;
-	settings.size_y = 1500;
+	settings.type = 1;
 	map = generate_random_island(settings);
 	map.regenerate(RESOLUTION);
 

@@ -175,11 +175,12 @@ class Island{
 
 		this.size = [size_x,size_y];
 		const size_type = [SIZES,CLUSTER_SIZES];
+		let temp = hash(seed)%size_type[this.type].length;
 		if(this.size[0] === -1){
-			this.size[0] = size_type[this.type][hash(seed)%size_type[this.type].length];
+			this.size[0] = size_type[this.type][temp + (temp+3 >= size_type[this.type].length ? 0 : hash(seed+2)%4)];
 		}
 		if(this.size[1] === -1){
-			this.size[1] = size_type[this.type][hash(seed)%size_type[this.type].length];
+			this.size[1] = size_type[this.type][temp + (temp+3 >= size_type[this.type].length ? 0 : hash(seed+1)%4)];
 		}
 
 		this.size.push(normalize((this.size[0]+this.size[1])/2,SIZES[0],SIZES[SIZES.length-1]));
@@ -553,7 +554,7 @@ class IslandCluster extends Island{
 		}
 
 		let island, size, x, y, valid, tries;
-		let max = 32+(hash(this.seed-10)%Math.round(this.size[0]/512));
+		let max = 16;
 		for(let isl = 0; isl < max; isl++){
 			size = SMALL_SIZES[hash(this.seed*isl+this.size[0])%SMALL_SIZES.length];
 			island = new Island(0, hash(this.seed*isl), size, size, 0, 0, 0.925, this.town[0]===-1 ? 0 : 1);
@@ -562,7 +563,7 @@ class IslandCluster extends Island{
 			tries = 0;
 			while(!valid){
 
-				if(tries>500){
+				if(tries>250){
 					break;
 				}
 
@@ -572,8 +573,8 @@ class IslandCluster extends Island{
 				valid = true;
 
 				//replace 0.2 and 0.8 with calculations
-				for(let i=Math.round(x+island.size[0]*0.2);i<x+island.size[0]*0.8; i += 16){
-					for(let j=Math.round(y+island.size[1]*0.2);j<y+island.size[1]*0.8; j += 16){
+				for(let i=Math.round(x+island.size[0]*0.25);i<x+island.size[0]*0.75; i += 32){
+					for(let j=Math.round(y+island.size[1]*0.25);j<y+island.size[1]*0.75; j += 32){
 						if(this.raw_data[i][j] >= 0.1){
 							valid = false;
 							break;
