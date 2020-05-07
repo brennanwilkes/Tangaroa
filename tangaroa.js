@@ -109,19 +109,21 @@ function tick(event){
 		player.rot = (player.rot-(Math.PI/100))%(Math.PI*2);
 	}
 
-	else if(player.onground){
+	if(player.onground){
 		player.speed = Math.max(0,player.speed-0.25);
 	}
-	else if(player.up){
-		if(player.left || player.right){
+	if(player.left || player.right){
+		if(player.up){
 			if(player.speed > 4){
 				player.speed = Math.max(4,player.speed-0.1);
 			}
 		}
 		else{
-			player.speed = Math.min(12,player.speed+0.05);
+			player.speed = Math.max(0,player.speed-0.1);
 		}
-
+	}
+	if(player.up){
+		player.speed = Math.min(12,player.speed+0.05);
 	}
 	else{
 		player.speed = Math.max(0,player.speed-0.1);
@@ -130,6 +132,13 @@ function tick(event){
 	if(player.onbeach){
 		if(player.speed > 1){
 			player.speed = Math.max(1,player.speed-1);
+		}
+
+		if(!map.visted){
+			if(map.attown(player.x,player.y)){
+				console.log("Welcome to "+map.replicable_seed);
+				map.visted = true;
+			}
 		}
 	}
 

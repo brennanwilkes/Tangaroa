@@ -123,6 +123,10 @@ const ISL_PERSIST = 2;
 const ISL_LAC = 0.7;
 
 
+const TOWN_HEIGHT = 0.38;
+let TOWN_DESIGN = [[[0,0,10,10],[0,15,10,10],[15,0,10,10],[15,15,10,10]]];
+
+
 let SMALL_SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408];
 
 let SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920, 2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072];
@@ -143,12 +147,15 @@ function generate_random_island(type=-1, seed=Math.random()*1000000, size_x=-1, 
 
 
 class Island{
-	constructor(type=0, seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0, LAC_SCALE_DOWN=1) {
+	constructor(type=0, seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0, LAC_SCALE_DOWN=1, GEN_TOWN=0) {
 
 		this.replicable_seed = seed;
 		this.seed = hash(seed);
 
 		this.type = type;
+
+		this.town = [-1,-1];
+		this.visited = false;
 
 		this.x = x;
 		this.y = y;
@@ -166,9 +173,10 @@ class Island{
 
 		this.size.push(normalize((this.size[0]+this.size[1])/2,SIZES[0],SIZES[SIZES.length-1]));
 
-		this.colours = ["DarkBlue","#2D5BA4","#297900","#D0AB76"];
+		this.colours = ["DarkBlue","#2D5BA4","#297900","#D0AB76","#654321"];
 
 		this.LAC_SCALE_DOWN = LAC_SCALE_DOWN;
+		this.GEN_TOWN = GEN_TOWN;
 
 		this.raw_data;
 		this.display_data;
@@ -204,7 +212,7 @@ class Island{
 			for(let y=0;y<n_y;y++){
 				for(let xx=0;xx<factor;xx++){
 					for(let yy=0;yy<factor;yy++){
-						comp[x][y] = Math.max(this.raw_data[x*factor+xx][y*factor+yy], comp[x][y]);
+						comp[x][y] = comp[x][y]===TOWN_HEIGHT ? TOWN_HEIGHT : Math.max(this.raw_data[x*factor+xx][y*factor+yy], comp[x][y]);
 					}
 				}
 			}
@@ -225,6 +233,9 @@ class Island{
 		//beach
 		this.display_data["#D0AB76"] = new Array();
 
+		//town
+		this.display_data["#654321"] = new Array();
+
 		for(let x=0;x<raw_data.length;x++){
 			for(let y=0;y<raw_data[0].length;y++){
 
@@ -236,6 +247,9 @@ class Island{
 				}
 				else if(raw_data[x][y] < 0.35){
 					this.display_data["#D0AB76"].push([x,y]);
+				}
+				else if(raw_data[x][y] === TOWN_HEIGHT){
+					this.display_data["#654321"].push([x,y]);
 				}
 				else{
 					this.display_data["#297900"].push([x,y]);
@@ -294,6 +308,7 @@ class Island{
 
 		const HAS_MOTU = this.seed%2 === 0;
 		const HAS_REEF = this.seed%4 === 0;
+		let HAS_TOWN = this.GEN_TOWN === 0 ? hash(this.seed+11)%2 : 1;
 
 		//generate base map
 		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,(ISL_LAC + 0.15*(1-this.size[2]))*this.LAC_SCALE_DOWN,hash(this.seed));
@@ -323,6 +338,11 @@ class Island{
 			mapMASK[x] = new Array(this.size[1]);
 			for(let y=0;y<this.size[1];y++){
 
+
+				if(HAS_TOWN === -1 && this.raw_data[x][y] === TOWN_HEIGHT){
+					continue;
+				}
+
 				//lower edges
 				this.raw_data[x][y] *= dist(x,y,this.size[0],this.size[1]);
 
@@ -339,6 +359,7 @@ class Island{
 				else{
 					mapMASK[x][y] = 0;
 				}
+
 
 				//apply motu styling
 				if(HAS_MOTU){
@@ -381,6 +402,26 @@ class Island{
 						this.raw_data[x][y]=0.05;
 					}
 				}
+
+				if(HAS_TOWN === 0){
+					if(Math.abs(this.raw_data[x][y]-TOWN_HEIGHT)<0.01){
+						HAS_TOWN = -1;
+						this.town = [x,y];
+						let town = TOWN_DESIGN[hash(this.seed-12)%TOWN_DESIGN.length];
+
+						for(let b = 0; b<town.length; b++){
+							for(let i=0;i<town[b][2];i++){
+								for(let j=0;j<town[b][3];j++){
+									this.raw_data[x+town[b][0]+i][y+town[b][1]+j] = TOWN_HEIGHT;
+
+								}
+							}
+						}
+
+					}
+				}
+
+
 			}
 		}
 	}
@@ -405,6 +446,10 @@ class Island{
 
 	onground(x, y){
 		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[x][y] >= 0.35);
+	}
+
+	attown(x, y){
+		return this.onbeach(x, y) && (Math.abs(x-this.town[0]) < 100) && (Math.abs(y-this.town[1]) < 100);
 	}
 }
 
@@ -433,7 +478,7 @@ class IslandCluster extends Island{
 		let max = 32+(hash(this.seed-10)%Math.round(this.size[0]/512));
 		for(let isl = 0; isl < max; isl++){
 			size = SMALL_SIZES[hash(this.seed*isl+this.size[0])%SMALL_SIZES.length];
-			island = new Island(0, hash(this.seed*isl), size, size, 0, 0, 0.925);
+			island = new Island(0, hash(this.seed*isl), size, size, 0, 0, 0.925, this.town[0]===-1 ? 0 : 1);
 
 			valid = false;
 			tries = 0;
@@ -460,6 +505,10 @@ class IslandCluster extends Island{
 				}
 			}
 			if(valid){
+				if(island.town[0] != -1){
+					this.town[0] = x+island.town[0];
+					this.town[1] = y+island.town[1];
+				}
 				this.blend(island,x,y);
 			}
 		}
