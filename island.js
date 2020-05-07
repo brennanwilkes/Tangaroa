@@ -134,15 +134,23 @@ let SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1
 
 let CLUSTER_SIZES = [2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072, 3200, 3328, 3456, 3584, 3712, 3840, 3968, 4096, 4224, 4352, 4480, 4608, 4736, 4864, 4992];
 
-function generate_random_island(type=-1, seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0){
-	if(type === -1){
-		type = hash(seed+5)%2;
+
+class IslandSettings{
+	seed=Math.random()*1000000;
+	size_x=-1;
+	size_y=-1;
+	x=0;
+	y=0;
+	type = hash(this.seed*this.seed)%2;
+}
+
+
+function generate_random_island(settings=new IslandSettings()){
+	if(settings.type === 0){
+		return new Island(0,settings.seed,settings.size_x,settings.size_y,settings.x,settings.y);
 	}
-	if(type === 0){
-		return new Island();
-	}
-	else if(type === 1){
-		return new IslandCluster();
+	else if(settings.type === 1){
+		return new IslandCluster(settings.seed,settings.size_x,settings.size_y,settings.x,settings.y);
 	}
 }
 
@@ -335,7 +343,7 @@ class Island{
 	//25,8,8,0.75
 	gen_island_data(){
 
-		console.log("generating island",this.size[0]+"x"+this.size[0],this.replicable_seed);
+		console.log("generating island",this.size[0]+"x"+this.size[1],this.replicable_seed);
 
 		const HAS_MOTU = this.seed%2 === 0;
 		const HAS_REEF = this.seed%4 === 0;
@@ -534,7 +542,7 @@ class IslandCluster extends Island{
 
 	gen_cluster_data(){
 
-		console.log("generating cluster",this.size[0]+"x"+this.size[0],this.replicable_seed);
+		console.log("generating cluster",this.size[0]+"x"+this.size[1],this.replicable_seed);
 
 		this.raw_data = new Array(this.size[0]);
 		for(let i=0; i<this.size[0]; i++){
