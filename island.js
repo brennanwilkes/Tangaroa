@@ -39,7 +39,7 @@ function normalize_2d_array(arr,minHeight,maxHeight){
 
 
 
-function gen_noise_map(width, height, scale, oct, persist, lac, seed){
+function gen_noise_map(width, height, scale, oct, persist, lac, seed, normalize=true){
 	noise.seed(seed);
 
 	let xx,yy;
@@ -77,9 +77,13 @@ function gen_noise_map(width, height, scale, oct, persist, lac, seed){
 			minHeight = Math.min(minHeight, map[x][y]);
 		}
 	}
+	if(!normalize){
+		map.minHeight = minHeight;
+		map.maxHeight = maxHeight;
+	}
 
 	//normalize
-	return normalize_2d_array(map,minHeight,maxHeight);
+	return normalize ? normalize_2d_array(map,minHeight,maxHeight) : map;
 }
 
 
@@ -366,17 +370,9 @@ class Island{
 		}
 
 		//generate base map
-		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,(ISL_LAC + 0.15*(1-this.size[2]))*this.LAC_SCALE_DOWN,hash(this.seed));
+		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,(ISL_LAC + 0.15*(1-this.size[2]))*this.LAC_SCALE_DOWN,hash(this.seed), false);
 
 
-		if(IS_ATOLL){
-			//Lower the height
-			this.raw_data = normalize_2d_array(this.raw_data, 0, 1.75);
-		}
-		else if(this.size[0] >= 512){
-			//Raise the height
-			this.raw_data = normalize_2d_array(this.raw_data, -0.5, 1);
-		}
 
 
 		let TOWN_SPAWN_X, TOWN_SPAWN_Y;
@@ -410,10 +406,10 @@ class Island{
 
 		if(HAS_MOTU){
 			motu_noise =  gen_noise_map(this.size[0], this.size[1], MOTU_SCALE,MOTU_OCT,MOTU_PERSIST,MOTU_LAC,hash(this.seed+1));
-						motu_noise = normalize_2d_array(motu_noise,-2,1);
-						if(HAS_REEF){
+			motu_noise = normalize_2d_array(motu_noise,-2,1);
+			if(HAS_REEF){
 				reef_noise =  gen_noise_map(this.size[0], this.size[1], REEF_SCALE,REEF_OCT,REEF_PERSIST,REEF_LAC,hash(this.seed+2));
-							}
+			}
 		}
 
 		let seed_scale = normalize(hash(this.seed+3)%250+750,0,1000);
@@ -421,6 +417,17 @@ class Island{
 		for(let x=0;x<this.size[0];x++){
 			mapMASK[x] = new Array(this.size[1]);
 			for(let y=0;y<this.size[1];y++){
+
+				this.raw_data[x][y] = normalize(this.raw_data[x][y], this.raw_data.minHeight, this.raw_data.maxHeight);
+
+				if(IS_ATOLL){
+					//Lower the height
+					this.raw_data[x][y] = normalize(this.raw_data[x][y], 0, 1.75);
+				}
+				else if(this.size[0] >= 512){
+					//Raise the height
+					this.raw_data[x][y] = normalize(this.raw_data[x][y], -0.5, 1);
+				}
 
 
 				if(HAS_TOWN === -1 && this.raw_data[x][y] === TOWN_HEIGHT){
