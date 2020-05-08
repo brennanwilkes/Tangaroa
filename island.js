@@ -604,3 +604,37 @@ class IslandCluster extends Island{
 		}
 	}
 }
+
+var TRANSIT_ISLAND_SIZE = 1024;
+
+class TransitIsland{
+	constructor(){
+		this.colours = ["darkblue"];
+		this.has_volcano = 0;
+		this.resolution = 4;
+		this.size = [TRANSIT_ISLAND_SIZE,TRANSIT_ISLAND_SIZE];
+
+		this.raw_data = new Array(TRANSIT_ISLAND_SIZE);
+		for(let x=0; x<TRANSIT_ISLAND_SIZE;x++){
+			this.raw_data[x] = new Array(TRANSIT_ISLAND_SIZE);
+			for(let y=0; y<TRANSIT_ISLAND_SIZE;y++){
+				this.raw_data[x][y] = 0;
+			}
+		}
+	}
+
+	draw(ctx, offsetx, offsety){}
+	regenerate(resolution){}
+	onbeach(x,y){
+		return false;
+	}
+
+	onground(x, y){
+		return false;
+	}
+
+	attown(x, y){
+		return false;
+	}
+
+}

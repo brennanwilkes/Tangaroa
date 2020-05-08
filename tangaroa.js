@@ -45,6 +45,10 @@ function setUp(){
 	player.ry = 0;
 	player.x = 0;
 	player.y = 0;
+	player.wx = 0;
+	player.wy = 0;
+
+
 	player.rot = 5/4*Math.PI;
 	player.xs = 0;
 	player.ys = 0;
@@ -65,21 +69,15 @@ function setUp(){
 
 	player.particles = new Array();
 
+	world = new Map();
+	world.regenerate(RESOLUTION);
+	map = world.get(player.wx,player.wy);
 
-	let settings = new IslandSettings();
-	settings.type = 0;
-
-
-	//map = generate_random_island(settings);
-	//map.regenerate(RESOLUTION);
 
 	addEventListener("keydown",key_down);
 	addEventListener("keyup",key_up);
 	intervalID = setInterval(tick,16);
 
-
-	world = new Map();
-	world.debug_draw(ctx,MAX_X);
 }
 
 function key_down(event){
@@ -127,6 +125,43 @@ function draw_screen(){
 }
 
 function tick(event){
+
+
+	//move in world
+	if((player.x < map.size[0]*-1) || (player.x > map.size[0]*2) || (player.y < map.size[1]*-1) || (player.y > map.size[1]*2)){
+
+		//go left
+		if(player.x < map.size[0]*-1){
+			player.wx--;
+			map = world.get(player.wx,player.wy);
+			player.rx = map.size[0]*3/2;
+			player.ry = map.size[1]/2;
+		}
+		//go right
+		else if(player.x > map.size[0]*2){
+			player.wx++;
+			map = world.get(player.wx,player.wy);
+			player.rx = map.size[0]*-0.5;
+			player.ry = map.size[1]/2;
+		}
+
+		//go up
+		else if(player.y < map.size[1]*-1){
+			player.wy--;
+			map = world.get(player.wx,player.wy);
+			player.rx = map.size[0]/2;
+			player.ry = map.size[1]*3/2;
+		}
+		//go down
+		else if(player.y > map.size[1]*2){
+			player.wy++;
+			map = world.get(player.wx,player.wy);
+			player.rx = map.size[0]/2;
+			player.ry = map.size[1]*-0.5;
+		}
+		console.log(player.wx,player.wy,player.rx,player.ry);
+	}
+
 	if(player.right){
 		player.rot = (player.rot+(Math.PI/100))%(Math.PI*2);
 	}

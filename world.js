@@ -4,7 +4,7 @@ const MAP_PERSIST = 2.5;
 const MAP_LAC = 0.6;
 
 class Map{
-	constructor(seed = Math.random()*10000, size=10){
+	constructor(seed = Math.random()*10000, size=8){
 		this.size = size;
 		this.replicable_seed = seed;
 		this.seed = hash(seed);
@@ -15,6 +15,7 @@ class Map{
 		this.raw_data;
 		this.islands;
 		this.total_islands = 0;
+		this.transit_island = new TransitIsland();
 
 		this.generate_map_data();
 		this.generate_islands();
@@ -64,8 +65,24 @@ class Map{
 				}
 			}
 		}
-
 		document.title = tit;
+	}
+
+	get(x,y){
+		if( x<0 || x>=this.size || y<0 || y>=this.size){
+			return this.transit_island;
+		}
+		return (this.raw_data[x][y] === 1 ? this.islands[x][y] : this.transit_island);
+	}
+
+	regenerate(res){
+		for(let x=0; x<this.size;x++){
+			for(let y=0; y<this.size;y++){
+				if(this.raw_data[x][y] === 1){
+					this.islands[x][y].regenerate(res);
+				}
+			}
+		}
 	}
 
 	debug_draw(ctx,max){
