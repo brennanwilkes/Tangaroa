@@ -323,11 +323,14 @@ class Island{
 					}
 				}
 				strip.push(amt);
+				strip.push(1);
 				temp.push(strip);
 			}
 			this.display_data[this.colours[c]] = temp;
 		}
 	}
+
+
 	regenerate(resolution){
 		this.resolution = resolution;
 		this.gen_display_data(this.compress(resolution));
@@ -349,15 +352,12 @@ class Island{
 	//25,8,8,0.75
 	gen_island_data(){
 
-		console.log("generating island",this.size[0]+"x"+this.size[1],this.replicable_seed);
-
 		const HAS_MOTU = this.seed%2 === 0;
 		const HAS_REEF = this.seed%4 === 0;
-		const IS_ATOLL = this.seed%2 === 0 && hash(this.seed-100)%8 === 0;
+		const IS_ATOLL = this.seed%2 === 0 && hash(this.seed-100)%4 === 0;
 		const IS_VOLCANO = this.seed%2 === 1 && hash(this.seed-66)%4 === 0;
 
 		let HAS_TOWN = this.GEN_TOWN;// === 0 ? hash(this.seed+11)%2 : 1;
-
 
 
 
@@ -368,6 +368,7 @@ class Island{
 		//generate base map
 		this.raw_data = gen_noise_map(this.size[0], this.size[1], ISL_SCALE,ISL_OCT,ISL_PERSIST,(ISL_LAC + 0.15*(1-this.size[2]))*this.LAC_SCALE_DOWN,hash(this.seed));
 
+
 		if(IS_ATOLL){
 			//Lower the height
 			this.raw_data = normalize_2d_array(this.raw_data, 0, 1.75);
@@ -376,6 +377,7 @@ class Island{
 			//Raise the height
 			this.raw_data = normalize_2d_array(this.raw_data, -0.5, 1);
 		}
+
 
 		let TOWN_SPAWN_X, TOWN_SPAWN_Y;
 		if(HAS_TOWN === 0){
@@ -388,11 +390,18 @@ class Island{
 				TOWN_SPAWN_Y = this.size[1]/4 * (hash(this.seed-24)%2 === 0 ? 1 : 3);
 			}
 
-			while((this.raw_data[Math.round(TOWN_SPAWN_X)][Math.round(TOWN_SPAWN_Y)] < TOWN_HEIGHT*1.25 ) && TOWN_SPAWN_X > 0 && TOWN_SPAWN_Y > 0){
+
+			let no_spawn = 25;
+			while((this.raw_data[Math.round(TOWN_SPAWN_X)][Math.round(TOWN_SPAWN_Y)] < TOWN_HEIGHT*1.25) && no_spawn > 0 ){
 				TOWN_SPAWN_X = TOWN_SPAWN_X * (TOWN_SPAWN_X > this.size[0]/2 ? 0.9 : 1.1 );
 				TOWN_SPAWN_Y = TOWN_SPAWN_Y * (TOWN_SPAWN_Y > this.size[1]/2 ? 0.9 : 1.1 );
+				no_spawn--;
 			}
-		}
+			if(no_spawn <= 0){
+				HAS_TOWN = 1;
+			}
+
+					}
 
 		let mapMASK = new Array(this.size[0]);
 
@@ -401,11 +410,10 @@ class Island{
 
 		if(HAS_MOTU){
 			motu_noise =  gen_noise_map(this.size[0], this.size[1], MOTU_SCALE,MOTU_OCT,MOTU_PERSIST,MOTU_LAC,hash(this.seed+1));
-			motu_noise = normalize_2d_array(motu_noise,-2,1);
-
-			if(HAS_REEF){
+						motu_noise = normalize_2d_array(motu_noise,-2,1);
+						if(HAS_REEF){
 				reef_noise =  gen_noise_map(this.size[0], this.size[1], REEF_SCALE,REEF_OCT,REEF_PERSIST,REEF_LAC,hash(this.seed+2));
-			}
+							}
 		}
 
 		let seed_scale = normalize(hash(this.seed+3)%250+750,0,1000);
@@ -473,8 +481,8 @@ class Island{
 					}
 				}
 				else if(IS_VOLCANO){
-					if(this.raw_data[x][y]>0.4){
-						this.raw_data[x][y] *= 1.5;
+					if(this.raw_data[x][y]>0.6){
+						this.raw_data[x][y] *= 1.25;
 					}
 				}
 
@@ -519,7 +527,7 @@ class Island{
 			ctx.fillStyle = this.colours[c];
 
 			for(let p=0;p<this.display_data[this.colours[c]].length;p++){
-				ctx.fillRect(this.display_data[this.colours[c]][p][0]*this.resolution, this.display_data[this.colours[c]][p][1]*this.resolution, this.resolution, this.display_data[this.colours[c]][p][2]*this.resolution);
+				ctx.fillRect(this.display_data[this.colours[c]][p][0]*this.resolution, this.display_data[this.colours[c]][p][1]*this.resolution, this.display_data[this.colours[c]][p][3]*this.resolution, this.display_data[this.colours[c]][p][2]*this.resolution);
 			}
 		}
 		ctx.restore();
@@ -548,8 +556,6 @@ class IslandCluster extends Island{
 
 	gen_cluster_data(){
 
-		console.log("generating cluster",this.size[0]+"x"+this.size[1],this.replicable_seed);
-
 		this.raw_data = new Array(this.size[0]);
 		for(let i=0; i<this.size[0]; i++){
 			this.raw_data[i] = new Array(this.size[1]);
@@ -560,30 +566,33 @@ class IslandCluster extends Island{
 
 		let island, size_x, size_y, x, y, valid, tries, temp;
 		let max = 16;
+
+		let tit = document.title;
+
 		for(let isl = 0; isl < max; isl++){
-			document.title = "Loading - "+(isl+1)+"/16";
+
+			document.title = "Loading - " + ( isl===0 ? "Cluster" : (Math.round(isl / 16 * 100)+"%") );
+
 			temp = hash(this.seed*isl)%SMALL_SIZES.length;
 			size_x = SMALL_SIZES[temp + (temp+3 >= SMALL_SIZES.length ? 0 : hash(this.seed*isl+2)%4)];
 			size_y = SMALL_SIZES[temp + (temp+3 >= SMALL_SIZES.length ? 0 : hash(this.seed*isl+1)%4)];
-
-			island = new Island(0, hash(this.seed*isl), size_x, size_y, 0, 0, 0.925, this.town[0]===-1 ? 0 : 1);
 
 			valid = false;
 			tries = 0;
 			while(!valid){
 
-				if(tries>250){
+				if(tries>25){
 					break;
 				}
 
-				x = hash(this.seed*isl-1)%(this.size[0]-island.size[0]);
-				y = hash(this.seed*isl-2)%(this.size[1]-island.size[1]);
+				x = hash(this.seed*isl*tries-1)%(this.size[0]-size_x);
+				y = hash(this.seed*isl*tries-2)%(this.size[1]-size_y);
 
 				valid = true;
 
 				//replace 0.2 and 0.8 with calculations
-				for(let i=Math.round(x+island.size[0]*0.25);i<x+island.size[0]*0.75; i += 32){
-					for(let j=Math.round(y+island.size[1]*0.25);j<y+island.size[1]*0.75; j += 32){
+				for(let i=Math.round(x+size_x*0.2);i<x+size_x*0.8; i += 32){
+					for(let j=Math.round(y+size_y*0.2);j<y+size_y*0.8; j += 32){
 						if(this.raw_data[i][j] >= 0.1){
 							valid = false;
 							break;
@@ -594,6 +603,8 @@ class IslandCluster extends Island{
 			}
 			if(valid){
 
+				island = new Island(0, hash(this.seed*isl), size_x, size_y, 0, 0, 0.925, this.town[0]===-1 ? 0 : 1);
+
 				this.has_volcano = this.has_volcano | island.has_volcano;
 
 				if(island.town[0] != -1){
@@ -603,6 +614,6 @@ class IslandCluster extends Island{
 				this.blend(island,x,y);
 			}
 		}
-		document.title = "Tangaroa";
+		document.title = tit;
 	}
 }
