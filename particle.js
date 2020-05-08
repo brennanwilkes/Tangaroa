@@ -22,7 +22,7 @@ class Particle{
 		ctx.translate(0,this.shift * (this.mirror ? -1 : 1));
 		this.shift += Math.sqrt(this.speed/5);
 
-		ctx.fillStyle = "rgba(45,91,164,"+(this.life / this.maxlife)+")";
+		ctx.fillStyle = "rgba(75,111,174,"+(this.life / this.maxlife)+")";
 		ctx.fillRect(5, 2 * (this.mirror ? -1 : 1),this.size,this.size);
 
 		ctx.restore();

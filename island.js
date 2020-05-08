@@ -127,7 +127,7 @@ const ISL_PERSIST = 2;
 const ISL_LAC = 0.7;
 
 
-const TOWN_HEIGHT = 0.38;
+const TOWN_HEIGHT = 0.36;
 let TOWN_DESIGN = [	[[-10,-10,10,10],[-10,10,10,10],[10,-10,10,10],[10,10,10,10]],
 					[[-15,-15,5,5],[-15,10,15,15],[10,-15,5,5],[15,15,15,15]]];
 
@@ -377,27 +377,9 @@ class Island{
 
 		let TOWN_SPAWN_X, TOWN_SPAWN_Y;
 		if(HAS_TOWN === 0){
-			TOWN_SPAWN_X = this.size[0]/4+hash(this.seed-20)%(this.size[0]/2);
-			TOWN_SPAWN_Y = this.size[1]/4+hash(this.seed-21)%(this.size[1]/2);
-			if(hash(this.seed-22)%2 === 0){
-				TOWN_SPAWN_X = this.size[0]/4 * (hash(this.seed-23)%2 === 0 ? 1 : 3);
-			}
-			else{
-				TOWN_SPAWN_Y = this.size[1]/4 * (hash(this.seed-24)%2 === 0 ? 1 : 3);
-			}
-
-
-			let no_spawn = 25;
-			while((this.raw_data[Math.round(TOWN_SPAWN_X)][Math.round(TOWN_SPAWN_Y)] < TOWN_HEIGHT*1.25) && no_spawn > 0 ){
-				TOWN_SPAWN_X = TOWN_SPAWN_X * (TOWN_SPAWN_X > this.size[0]/2 ? 0.9 : 1.1 );
-				TOWN_SPAWN_Y = TOWN_SPAWN_Y * (TOWN_SPAWN_Y > this.size[1]/2 ? 0.9 : 1.1 );
-				no_spawn--;
-			}
-			if(no_spawn <= 0){
-				HAS_TOWN = 1;
-			}
-
-					}
+			TOWN_SPAWN_X = hash(this.seed-23)%2 === 0;
+			TOWN_SPAWN_Y = hash(this.seed-24)%2 === 0;
+		}
 
 		let mapMASK = new Array(this.size[0]);
 
@@ -418,6 +400,10 @@ class Island{
 			mapMASK[x] = new Array(this.size[1]);
 			for(let y=0;y<this.size[1];y++){
 
+				if(HAS_TOWN === -1 && this.raw_data[x][y] === TOWN_HEIGHT){
+					continue;
+				}
+
 				this.raw_data[x][y] = normalize(this.raw_data[x][y], this.raw_data.minHeight, this.raw_data.maxHeight);
 
 				if(IS_ATOLL){
@@ -430,9 +416,7 @@ class Island{
 				}
 
 
-				if(HAS_TOWN === -1 && this.raw_data[x][y] === TOWN_HEIGHT){
-					continue;
-				}
+
 
 				//lower edges
 				this.raw_data[x][y] *= dist(x,y,this.size[0],this.size[1]);
@@ -503,7 +487,7 @@ class Island{
 				}
 
 				if(HAS_TOWN === 0){
-					if(Math.abs(this.raw_data[x][y]-TOWN_HEIGHT)<0.01 && Math.abs(x-TOWN_SPAWN_X)<this.size[0]/8 && Math.abs(y-TOWN_SPAWN_Y)<this.size[1]/8){
+					if(Math.abs(this.raw_data[x][y]-TOWN_HEIGHT)<0.01 && ( TOWN_SPAWN_X ? (x > this.size[0]/2) : (x < this.size[0]/2) ) && ( TOWN_SPAWN_Y ? (y > this.size[1]/2) : (y < this.size[1]/2) ) ){
 						HAS_TOWN = -1;
 						this.town = [x,y];
 						let town = TOWN_DESIGN[hash(this.seed-12)%TOWN_DESIGN.length];
@@ -574,11 +558,8 @@ class IslandCluster extends Island{
 		let island, size_x, size_y, x, y, valid, tries, temp;
 		let max = 16;
 
-		let tit = document.title;
 
 		for(let isl = 0; isl < max; isl++){
-
-			document.title = "Loading - " + ( isl===0 ? "Cluster" : (Math.round(isl / 16 * 100)+"%") );
 
 			temp = hash(this.seed*isl)%SMALL_SIZES.length;
 			size_x = SMALL_SIZES[temp + (temp+3 >= SMALL_SIZES.length ? 0 : hash(this.seed*isl+2)%4)];
@@ -588,7 +569,7 @@ class IslandCluster extends Island{
 			tries = 0;
 			while(!valid){
 
-				if(tries>25){
+				if(tries>100){
 					break;
 				}
 
@@ -621,6 +602,5 @@ class IslandCluster extends Island{
 				this.blend(island,x,y);
 			}
 		}
-		document.title = tit;
 	}
 }

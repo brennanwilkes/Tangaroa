@@ -18,6 +18,7 @@ const Resolution = Object.freeze({"ultralow":8,"low":4, "medium":2, "high":1})
 var RESOLUTION = Resolution.low;
 
 var map;
+var world;
 var player;
 var intervalID;
 var tickCount = 0;
@@ -38,6 +39,7 @@ function setUp(){
 	canvas.width = MAX_X;
 	canvas.height = MAX_Y;
 
+
 	player = new Object();
 	player.rx = 0;
 	player.ry = 0;
@@ -47,6 +49,7 @@ function setUp(){
 	player.xs = 0;
 	player.ys = 0;
 	player.speed = 0;
+	player.push = 0;
 
 	player.img = new Image();
 	player.img.src = "canoe.png";
@@ -67,12 +70,16 @@ function setUp(){
 	settings.type = 0;
 
 
-	map = generate_random_island(settings);
-	map.regenerate(RESOLUTION);
+	//map = generate_random_island(settings);
+	//map.regenerate(RESOLUTION);
 
 	addEventListener("keydown",key_down);
 	addEventListener("keyup",key_up);
 	intervalID = setInterval(tick,16);
+
+
+	world = new Map();
+	world.debug_draw(ctx,MAX_X);
 }
 
 function key_down(event){
@@ -147,7 +154,7 @@ function tick(event){
 		player.speed = Math.max(0,player.speed-0.1);
 	}
 	if(player.speed > 0.5){
-		if(player.x < 0 || player.x >= map.size[0] || player.y < 0 || player.y >= map.size[1] || map.raw_data[player.x][player.y] < 0.1){
+		if(player.x < 0 || player.x >= map.size[0] || player.y < 0 || player.y >= map.size[1] || map.raw_data[player.x][player.y] < 0.3){
 			for(let i=0.15;i<1;i+=0.25){
 				player.particles.push(new Particle(player.x, player.y, player.speed*i, player.rot, true,10 + 5*(1-i)*player.speed ,Math.round(6*(1-i)/1) ));
 				player.particles.push(new Particle(player.x, player.y, player.speed*i, player.rot, false,10 + 5*(1-i)*player.speed ,Math.round(6*(1-i)/1) ));
@@ -170,6 +177,24 @@ function tick(event){
 
 	player.xs = player.speed*Math.cos(player.rot);
 	player.ys = player.speed*Math.sin(player.rot);
+
+	//random waves
+	if(player.speed > 2){
+		player.xs += Math.sin(tickCount/10)*Math.cos(player.rot+Math.PI/2)*player.speed/12;
+		player.ys += Math.sin(tickCount/10)*Math.sin(player.rot+Math.PI/2)*player.speed/12;
+
+		if(tickCount%60 === 0){
+			player.push = (Math.random()*0.01-0.005) * Math.PI;
+		}
+		else if(tickCount%60 < 20){
+			player.rot += player.push;
+		}
+	}
+
+
+
+
+
 
 	player.rx = player.rx-player.xs;
 	player.ry = player.ry-player.ys;
