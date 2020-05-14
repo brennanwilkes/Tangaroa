@@ -66,10 +66,12 @@ function setUp(){
 	player.right = false;
 	player.up = false;
 	player.down = false;
+	player.space = false;
 
 	player.particles = new Array();
+	player.events = new Array();
 
-	world = new Map(true);
+	world = new Map(false,5);
 	world.regenerate(RESOLUTION);
 	map = world.get(player.wx,player.wy);
 
@@ -84,10 +86,16 @@ function key_down(event){
 	if(event.key.substring(0,5) === "Arrow"){
 		player[event.key.substring(5).toLowerCase()] = true;
 	}
+	else if(event.code==="Space"){
+		player.space = true;
+	}
 }
 function key_up(event){
 	if(event.key.substring(0,5) === "Arrow"){
 		player[event.key.substring(5).toLowerCase()] = false;
+	}
+	else if(event.code==="Space"){
+		player.space = false;
 	}
 }
 
@@ -125,39 +133,52 @@ function draw_screen(){
 }
 
 function tick(event){
+	if(player.space){
+		map_tick(event);
+	}
+	else{
+		game_tick(event);
+	}
+}
+
+function map_tick(event){
+	world.draw(ctx);
+}
+
+function game_tick(event){
 
 
 	//move in world
-	if((player.rx < MAX_X*-1) || (player.rx > MAX_X*2) || (player.ry < MAX_Y*-1) || (player.ry > MAX_Y*2)){
+	if((player.rx < Math.max(MAX_X,map.size[0])*-1) || (player.rx > Math.max(MAX_X,map.size[0])*2) || (player.ry < Math.max(MAX_Y,map.size[1])*-1) || (player.ry > Math.max(MAX_Y,map.size[1])*2)){
 
 		//go left
-		if(player.rx < MAX_X*-2){
+		if(player.rx < Math.max(MAX_X,map.size[0])*-1){
 			player.wx--;
 			map = world.get(player.wx,player.wy);
-			player.rx = MAX_X*3/2;
-			player.ry = MAX_Y/2;
+			player.rx = Math.max(MAX_X,map.size[0])*3/2;
+			player.ry = Math.max(MAX_Y,map.size[1])/2;
 		}
 		//go right
-		else if(player.rx > MAX_X*2){
+		else if(player.rx > Math.max(MAX_X,map.size[0])*2){
 			player.wx++;
 			map = world.get(player.wx,player.wy);
-			player.rx = MAX_X*-0.5;
-			player.ry = MAX_Y/2;
+			player.rx = Math.max(MAX_X,map.size[0])*-0.5;
+			player.ry = Math.max(MAX_Y,map.size[1])/2;
 		}
 
 		//go up
-		else if(player.ry < MAX_Y*-1){
+		else if(player.ry < Math.max(MAX_Y,map.size[1])*-1){
 			player.wy--;
 			map = world.get(player.wx,player.wy);
-			player.rx = MAX_X/2;
-			player.ry = MAX_Y*3/2;
+			player.rx = Math.max(MAX_X,map.size[0])/2;
+			player.ry = Math.max(MAX_Y,map.size[1])*3/2;
 		}
 		//go down
-		else if(player.ry > MAX_Y*2){
+		else if(player.ry > Math.max(MAX_Y,map.size[1])*2){
 			player.wy++;
 			map = world.get(player.wx,player.wy);
-			player.rx = MAX_X/2;
-			player.ry = MAX_Y*-0.5;
+			player.rx = Math.max(MAX_X,map.size[0])/2;
+			player.ry = Math.max(MAX_Y,map.size[1])*-0.5;
 		}
 
 		for(let p=0;p<player.particles.length;p++){
@@ -167,8 +188,6 @@ function tick(event){
 
 		player.x = Math.round(player.rx);
 		player.y = Math.round(player.ry);
-
-		console.log(player.wx,player.wy);
 
 	}
 
@@ -206,7 +225,7 @@ function tick(event){
 			}
 		}
 	}
-	if((tickCount%20 === 0 && player.speed < 6) || (player.speed >=6 && tickCount%12 < player.speed-5)){
+	if((tickCount%20 === 0 && player.speed < 6) || (player.speed >=6 && tickCount%10 < player.speed-5)){
 		let part_x, part_y;
 		for(let iter = 0; iter < 25; iter++){
 			part_x = ran_b(player.x-MAX_X/2,player.x+MAX_X/2);

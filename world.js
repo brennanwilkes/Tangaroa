@@ -4,7 +4,7 @@ const MAP_PERSIST = 2.5;
 const MAP_LAC = 0.6;
 
 class Map{
-	constructor(dummy=false,seed = Math.random()*10000, size=1){
+	constructor(dummy=false,size=1,seed = Math.random()*10000){
 		this.size = size;
 		this.replicable_seed = seed;
 		this.seed = hash(seed);
@@ -63,7 +63,8 @@ class Map{
 					total++;
 					document.title = "Loading - " + ( (x===0 && y < 2) ? "Tangaroa" : (Math.round(100*total/this.total_islands)+"%") );
 
-					this.settings.seed = hash(this.settings.seed+x*y);
+					this.settings.seed = hash((this.settings.seed+x*y)*hash(this.seed));
+					this.settings.type = hash(this.settings.seed)%2;
 					this.settings.x = x;
 					this.settings.y = y;
 
@@ -92,21 +93,44 @@ class Map{
 		}
 	}
 
-	debug_draw(ctx,max){
-		clearInterval(1);
-		let sqr = max / this.size;
+	draw(ctx){
+		let sqr = Math.round(Math.min(ctx.canvas.width,ctx.canvas.height)*0.75 / this.size);
+		let w = Math.round(ctx.canvas.width/2-(sqr*this.size/2));
+		let h = Math.round(ctx.canvas.height/2-(sqr*this.size/2));
+
+		ctx.fillStyle = "#654321";
+		ctx.fillRect(w-10,h-10,sqr*this.size+20,sqr*this.size+20);
+		ctx.fillStyle = "#957351";
+		ctx.fillRect(w,h,sqr*this.size,sqr*this.size);
+		ctx.fillStyle = "#604321";
+		ctx.strokeStyle = "#453311";
+		ctx.lineWidth = 2;
+
+		let b_x, b_y;
+
 		for(let x=0; x<this.size;x++){
 			for(let y=0; y<this.size;y++){
 				if(this.raw_data[x][y] === 1){
-					ctx.fillStyle = "white";
+					b_x = Math.round(w+x*sqr+sqr/2);
+					b_y = Math.round(h+y*sqr+sqr/2);
+					if(this.islands[x][y].type === 0){
+						ctx.beginPath();
+						ctx.arc(b_x,b_y, Math.round(sqr/2.5), 0, 2 * Math.PI);
+						ctx.fill();
+						ctx.stroke();
+					}
+					else{
+						for(let i=-1;i<2;i+=2){
+							for(let j=-1;j<2;j+=2){
+								ctx.beginPath();
+								ctx.arc(Math.round(b_x+(i*sqr/4)),Math.round(b_y+(j*sqr/4)), Math.round(sqr/5), 0, 2 * Math.PI);
+								ctx.fill();
+								ctx.stroke();
+							}
+						}
+					}
+
 				}
-				else if(this.raw_data[x][y] === 0.5){
-					ctx.fillStyle = "black";
-				}
-				else{
-					ctx.fillStyle = "black";
-				}
-				ctx.fillRect(x*sqr,y*sqr,sqr,sqr);
 			}
 		}
 	}
