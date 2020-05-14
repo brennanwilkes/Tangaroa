@@ -69,7 +69,7 @@ function setUp(){
 
 	player.particles = new Array();
 
-	world = new Map();
+	world = new Map(true);
 	world.regenerate(RESOLUTION);
 	map = world.get(player.wx,player.wy);
 
@@ -128,38 +128,48 @@ function tick(event){
 
 
 	//move in world
-	if((player.x < map.size[0]*-1) || (player.x > map.size[0]*2) || (player.y < map.size[1]*-1) || (player.y > map.size[1]*2)){
+	if((player.rx < MAX_X*-1) || (player.rx > MAX_X*2) || (player.ry < MAX_Y*-1) || (player.ry > MAX_Y*2)){
 
 		//go left
-		if(player.x < map.size[0]*-1){
+		if(player.rx < MAX_X*-2){
 			player.wx--;
 			map = world.get(player.wx,player.wy);
-			player.rx = map.size[0]*3/2;
-			player.ry = map.size[1]/2;
+			player.rx = MAX_X*3/2;
+			player.ry = MAX_Y/2;
 		}
 		//go right
-		else if(player.x > map.size[0]*2){
+		else if(player.rx > MAX_X*2){
 			player.wx++;
 			map = world.get(player.wx,player.wy);
-			player.rx = map.size[0]*-0.5;
-			player.ry = map.size[1]/2;
+			player.rx = MAX_X*-0.5;
+			player.ry = MAX_Y/2;
 		}
 
 		//go up
-		else if(player.y < map.size[1]*-1){
+		else if(player.ry < MAX_Y*-1){
 			player.wy--;
 			map = world.get(player.wx,player.wy);
-			player.rx = map.size[0]/2;
-			player.ry = map.size[1]*3/2;
+			player.rx = MAX_X/2;
+			player.ry = MAX_Y*3/2;
 		}
 		//go down
-		else if(player.y > map.size[1]*2){
+		else if(player.ry > MAX_Y*2){
 			player.wy++;
 			map = world.get(player.wx,player.wy);
-			player.rx = map.size[0]/2;
-			player.ry = map.size[1]*-0.5;
+			player.rx = MAX_X/2;
+			player.ry = MAX_Y*-0.5;
 		}
-		console.log(player.wx,player.wy,player.rx,player.ry);
+
+		for(let p=0;p<player.particles.length;p++){
+			player.particles[p].x = Math.round(player.rx - (player.x - player.particles[p].x));
+			player.particles[p].y = Math.round(player.ry - (player.y - player.particles[p].y));
+		}
+
+		player.x = Math.round(player.rx);
+		player.y = Math.round(player.ry);
+
+		console.log(player.wx,player.wy);
+
 	}
 
 	if(player.right){
@@ -188,11 +198,11 @@ function tick(event){
 	else{
 		player.speed = Math.max(0,player.speed-0.1);
 	}
-	if(player.speed > 0.5){
+	if(player.speed > 1 && tickCount%3==0){
 		if(player.x < 0 || player.x >= map.size[0] || player.y < 0 || player.y >= map.size[1] || map.raw_data[player.x][player.y] < 0.3){
 			for(let i=0.15;i<1;i+=0.25){
-				player.particles.push(new Particle(player.x, player.y, player.speed*i, player.rot, true,10 + 5*(1-i)*player.speed ,Math.round(6*(1-i)/1) ));
-				player.particles.push(new Particle(player.x, player.y, player.speed*i, player.rot, false,10 + 5*(1-i)*player.speed ,Math.round(6*(1-i)/1) ));
+				player.particles.push(new Particle(player.x, player.y, player.speed*i, player.rot, true,30 + 5*(1-i)*player.speed ,Math.round(6*(1-i)/1) ));
+				player.particles.push(new Particle(player.x, player.y, player.speed*i, player.rot, false,30 + 5*(1-i)*player.speed ,Math.round(6*(1-i)/1) ));
 			}
 		}
 	}

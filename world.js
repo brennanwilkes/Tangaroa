@@ -4,10 +4,12 @@ const MAP_PERSIST = 2.5;
 const MAP_LAC = 0.6;
 
 class Map{
-	constructor(seed = Math.random()*10000, size=8){
+	constructor(dummy=false,seed = Math.random()*10000, size=1){
 		this.size = size;
 		this.replicable_seed = seed;
 		this.seed = hash(seed);
+
+		this.dummy = dummy;
 
 		this.settings = new IslandSettings();
 		this.settings.seed = this.seed;
@@ -52,6 +54,11 @@ class Map{
 		for(let x=0; x<this.size;x++){
 			this.islands[x] = new Array(this.size);
 			for(let y=0; y<this.size;y++){
+
+				if(this.dummy){
+					this.raw_data[x][y] = 0;
+				}
+
 				if(this.raw_data[x][y] === 1){
 					total++;
 					document.title = "Loading - " + ( (x===0 && y < 2) ? "Tangaroa" : (Math.round(100*total/this.total_islands)+"%") );
