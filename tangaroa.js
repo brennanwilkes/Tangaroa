@@ -199,10 +199,21 @@ function tick(event){
 		player.speed = Math.max(0,player.speed-0.1);
 	}
 	if(player.speed > 1 && tickCount%3==0){
-		if(player.x < 0 || player.x >= map.size[0] || player.y < 0 || player.y >= map.size[1] || map.raw_data[player.x][player.y] < 0.3){
+		if(!map.onbeach(player.x,player.y) && !map.onground(player.x,player.y)){
 			for(let i=0.15;i<1;i+=0.25){
 				player.particles.push(new Particle(player.x, player.y, player.speed*i, player.rot, true,30 + 5*(1-i)*player.speed ,Math.round(6*(1-i)/1) ));
 				player.particles.push(new Particle(player.x, player.y, player.speed*i, player.rot, false,30 + 5*(1-i)*player.speed ,Math.round(6*(1-i)/1) ));
+			}
+		}
+	}
+	if((tickCount%20 === 0 && player.speed < 6) || (player.speed >=6 && tickCount%12 < player.speed-5)){
+		let part_x, part_y;
+		for(let iter = 0; iter < 25; iter++){
+			part_x = ran_b(player.x-MAX_X/2,player.x+MAX_X/2);
+			part_y = ran_b(player.y-MAX_Y/2,player.y+MAX_Y/2);
+			if(!map.onbeach(part_x,part_y) && !map.onground(part_x,part_y)){
+				player.particles.push(new Particle(part_x,part_y, 0, 0, false, 100 , 4));
+				break
 			}
 		}
 	}

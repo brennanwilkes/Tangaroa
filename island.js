@@ -16,7 +16,7 @@ function dist(x,y,w,h){
 	@returns {number} Random integer min_b <= num <= max_b
 */
 function ran_b(min_b,max_b){
-	return Math.floor( min_b + Math.random()*(max_b+1) );
+	return Math.floor( min_b + Math.random()*((max_b-min_b)+1) );
 }
 
 
