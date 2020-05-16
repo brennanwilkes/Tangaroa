@@ -225,7 +225,7 @@ function game_tick(event){
 			}
 		}
 	}
-	if((tickCount%60 === 0 && player.speed < 6) || (player.speed >=6 && tickCount%48 < (player.speed*2))){
+	if((tickCount%60 === 0 && player.speed < 6) || (player.speed >=6 && tickCount%60 < (player.speed-6)*4)){
 		let part_x, part_y;
 		for(let iter = 0; iter < 25; iter++){
 			part_x = player.speed < 6 ? ran_b(player.x-MAX_X/2,player.x+MAX_X/2) : ran_b(Math.round(player.x-MAX_X/1.5),Math.round(player.x+MAX_X/1.5)) ;
