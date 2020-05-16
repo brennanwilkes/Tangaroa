@@ -64,7 +64,7 @@ class Map{
 					document.title = "Loading - " + ( (x===0 && y < 2) ? "Tangaroa" : (Math.round(100*total/this.total_islands)+"%") );
 
 					this.settings.seed = hash((this.settings.seed+x*y)*hash(this.seed));
-					this.settings.type = hash(this.settings.seed)%2;
+					this.settings.type = hash(this.settings.seed)%4 === 0 ? 1 : 0;
 					this.settings.x = x;
 					this.settings.y = y;
 

@@ -71,14 +71,14 @@ function setUp(){
 	player.particles = new Array();
 	player.events = new Array();
 
-	world = new Map(false,5);
+	world = new Map(true);
 	world.regenerate(RESOLUTION);
 	map = world.get(player.wx,player.wy);
 
 
 	addEventListener("keydown",key_down);
 	addEventListener("keyup",key_up);
-	intervalID = setInterval(tick,16);
+	intervalID = setInterval(tick,4);
 
 }
 
@@ -192,46 +192,46 @@ function game_tick(event){
 	}
 
 	if(player.right){
-		player.rot = (player.rot+(Math.PI/100))%(Math.PI*2);
+		player.rot = (player.rot+(Math.PI/400))%(Math.PI*2);
 	}
 	if(player.left){
-		player.rot = (player.rot-(Math.PI/100))%(Math.PI*2);
+		player.rot = (player.rot-(Math.PI/400))%(Math.PI*2);
 	}
 
 	if(player.onground){
-		player.speed = Math.max(0,player.speed-0.25);
+		player.speed = Math.max(0,player.speed-0.0625);
 	}
 	if(player.left || player.right){
 		if(player.up){
 			if(player.speed > 4){
-				player.speed = Math.max(4,player.speed-0.1);
+				player.speed = Math.max(4,player.speed-0.025);
 			}
 		}
 		else{
-			player.speed = Math.max(0,player.speed-0.1);
+			player.speed = Math.max(0,player.speed-0.025);
 		}
 	}
 	if(player.up){
-		player.speed = Math.min(12,player.speed+0.05);
+		player.speed = Math.min(16,player.speed+(player.speed < 4 ? 0.004 : 0.0125));
 	}
 	else{
-		player.speed = Math.max(0,player.speed-0.1);
+		player.speed = Math.max(0,player.speed-0.025);
 	}
-	if(player.speed > 1 && tickCount%3==0){
-		if(!map.onbeach(player.x,player.y) && !map.onground(player.x,player.y)){
-			for(let i=0.15;i<1;i+=0.25){
-				player.particles.push(new Particle(player.x, player.y, player.speed*i, player.rot, true,30 + 5*(1-i)*player.speed ,Math.round(6*(1-i)/1) ));
-				player.particles.push(new Particle(player.x, player.y, player.speed*i, player.rot, false,30 + 5*(1-i)*player.speed ,Math.round(6*(1-i)/1) ));
+	if(player.speed > 1 && tickCount%18==0){
+		if(!player.onbeach && !player.onground){
+			for(let i=0.05;i<1;i+=0.25){
+				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, true, (30 + 5*(1-i)*player.speed*12),Math.round(6*(1-i)/1) ));
+				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, false, (30 + 5*(1-i)*player.speed*12) ,Math.round(6*(1-i)/1) ));
 			}
 		}
 	}
-	if((tickCount%20 === 0 && player.speed < 6) || (player.speed >=6 && tickCount%10 < player.speed-5)){
+	if((tickCount%60 === 0 && player.speed < 6) || (player.speed >=6 && tickCount%48 < (player.speed*2))){
 		let part_x, part_y;
 		for(let iter = 0; iter < 25; iter++){
-			part_x = ran_b(player.x-MAX_X/2,player.x+MAX_X/2);
-			part_y = ran_b(player.y-MAX_Y/2,player.y+MAX_Y/2);
+			part_x = player.speed < 6 ? ran_b(player.x-MAX_X/2,player.x+MAX_X/2) : ran_b(Math.round(player.x-MAX_X/1.5),Math.round(player.x+MAX_X/1.5)) ;
+			part_y = player.speed < 6 ? ran_b(player.y-MAX_Y/2,player.y+MAX_Y/2) : ran_b(Math.round(player.y-MAX_Y/1.5),Math.round(player.y+MAX_Y/1.5)) ;
 			if(!map.onbeach(part_x,part_y) && !map.onground(part_x,part_y)){
-				player.particles.push(new Particle(part_x,part_y, 0, 0, false, 100 , 4));
+				player.particles.push(new Particle(part_x,part_y, 0, 0, false, 400 , 4));
 				break
 			}
 		}
@@ -250,19 +250,19 @@ function game_tick(event){
 		}
 	}
 
-	player.xs = player.speed*Math.cos(player.rot);
-	player.ys = player.speed*Math.sin(player.rot);
+	player.xs = player.speed*Math.cos(player.rot)/4;
+	player.ys = player.speed*Math.sin(player.rot)/4;
 
 	//random waves
-	if(player.speed > 2){
-		player.xs += Math.sin(tickCount/10)*Math.cos(player.rot+Math.PI/2)*player.speed/12;
-		player.ys += Math.sin(tickCount/10)*Math.sin(player.rot+Math.PI/2)*player.speed/12;
+	if(player.speed > 4){
+		//player.xs += Math.sin(tickCount/10)*Math.cos(player.rot+Math.PI/2)*player.speed/48;
+		//player.ys += Math.sin(tickCount/10)*Math.sin(player.rot+Math.PI/2)*player.speed/48;
 
-		if(tickCount%60 === 0){
+		if(tickCount%240 === 0){
 			player.push = (Math.random()*0.01-0.005) * Math.PI;
 		}
-		else if(tickCount%60 < 20){
-			player.rot += player.push;
+		else if(tickCount%240 < 90){
+			player.rot += player.push/3;
 		}
 	}
 

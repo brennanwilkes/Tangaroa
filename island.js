@@ -145,7 +145,7 @@ class IslandSettings{
 	size_y=-1;
 	x=0;
 	y=0;
-	type = hash(this.seed*this.seed)%2;
+	type = 0;
 }
 
 
