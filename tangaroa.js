@@ -71,9 +71,13 @@ function setUp(){
 	player.particles = new Array();
 	player.events = new Array();
 
-	world = new Map(false,5);
+	world = new Map(true);
 	world.regenerate(RESOLUTION);
 	map = world.get(player.wx,player.wy);
+
+	new Boid(0,0,0,2);
+	new Boid(100,0,1,2);
+	new Boid(0,-100,-1,2);
 
 
 	addEventListener("keydown",key_down);
@@ -109,6 +113,10 @@ function draw_screen(){
 			player.particles.splice(p, 1);
 			p--;
 		}
+	}
+
+	for(let b = 0; b < Boid.totalBoids; b++){
+		Boid.boids[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 	}
 
 	ctx.save();
@@ -266,10 +274,13 @@ function game_tick(event){
 		}
 	}
 
+	if(tickCount%60 === 0) {
+		calc_boid_center();
+	}
 
-
-
-
+	for(let b = 0; b < Boid.totalBoids; b++){
+		Boid.boids[b].tick();
+	}
 
 	player.rx = player.rx-player.xs;
 	player.ry = player.ry-player.ys;
