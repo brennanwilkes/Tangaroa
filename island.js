@@ -614,6 +614,8 @@ class TransitIsland{
 		this.resolution = 4;
 		this.size = [TRANSIT_ISLAND_SIZE,TRANSIT_ISLAND_SIZE];
 
+		this.is_transit = true;
+
 		this.raw_data = new Array(TRANSIT_ISLAND_SIZE);
 		for(let x=0; x<TRANSIT_ISLAND_SIZE;x++){
 			this.raw_data[x] = new Array(TRANSIT_ISLAND_SIZE);

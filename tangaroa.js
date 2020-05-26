@@ -11,6 +11,7 @@ const MAX_X = Math.max(document.documentElement.clientWidth, window.innerWidth |
 
 const ISL_DEFAULT_SIZE = 2000;
 
+
 var canvas = document.getElementById("map");
 var ctx = canvas.getContext("2d");
 
@@ -71,13 +72,10 @@ function setUp(){
 	player.particles = new Array();
 	player.events = new Array();
 
-	world = new Map(true);
+	world = new Map(false,1);
 	world.regenerate(RESOLUTION);
 	map = world.get(player.wx,player.wy);
 
-	for(let b=0;b<10;b++){
-		//new Boid(Math.round(Math.random()*100-50),Math.round(Math.random()*100-50),Math.round(Math.random()*6-3),Math.round(Math.random()*2),Math.round(Math.random()*2));
-	}
 
 	addEventListener("keydown",key_down);
 	addEventListener("keyup",key_up);
@@ -275,7 +273,7 @@ function game_tick(event){
 		}
 	}
 
-	if(player.speed > 4 && Boid.totalBoids < 5) {
+	if(player.speed > 4 && Boid.totalBoids < 5 && map.is_transit) {
 		let num_new_boids = ran_b(5,20);
 		for(let n=0;n<num_new_boids;n++){
 			new Boid(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-100,100), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-100,100), Math.cos(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-2,2), Math.sin(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-2,2));
