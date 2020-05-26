@@ -1,14 +1,11 @@
-const COLIDE_DEPTH = 10;
-const COLIDE_LIMIT = 10;
-const ROT_SCALE = 0.0025;
+const ALN_FORCE = 0.0075;
+const COH_FORCE = 0.01;
+const SEP_FORCE = -0.001;
 
-function calc_boid_center(){
-	Boid.centerPoint = [0,0];
-	for(let b=0; b < Boid.totalBoids; b++){
-		Boid.centerPoint = [Boid.centerPoint[0]+Boid.boids[b].position[0],Boid.centerPoint[1]+Boid.boids[b].position[1]];
-	}
-	Boid.centerPoint = [Math.round(Boid.centerPoint[0]/Boid.totalBoids), Math.round(Boid.centerPoint[1]/Boid.totalBoids)];
-}
+const VIEW_DIST = 500;
+const VIEW_ANG = Math.PI/2;
+
+const MOVE_SPEED = 0.1;
 
 function dist(a,b){
 	return Math.sqrt(Math.pow(a[0]-b[0],2)+Math.pow(a[1]-b[1],2));
@@ -20,10 +17,16 @@ function bound_ang(a){
 
 class Boid{
 
-	constructor(x, y, dir, speed){
+	constructor(x, y, xs, ys){
+
 		this.position = [x, y];
-		this.dir = dir;
-		this.speed = speed;
+		this.velocity = [xs, ys];
+		this.dir = bound_ang(this.get_ang(this.velocity));
+
+		this.img = new Image();
+		this.img.src = "boid.png";
+
+		this.slowdown = 360;
 
 		Boid.boids.push(this);
 		Boid.totalBoids++;
@@ -33,55 +36,91 @@ class Boid{
 		return dist(this.position,boi.position);
 	}
 
-	ang_match(a){
-		return (Math.abs(this.dir-a) < Math.abs(this.dir-a-Math.PI));
+	get_ang(pos){
+		if(pos===undefined){
+			return Math.atan2(this.velocity[1],this.velocity[0]);
+		}
+		return Math.atan2((pos[1]-this.position[1]),(pos[0]-this.position[0]));
+	}
+
+	turn(ang,force){
+		this.velocity[0] += force * Math.cos(ang);
+		this.velocity[1] += force * Math.sin(ang);
+	}
+
+	within_sight(boi){
+		return Math.abs(this.get_ang()-this.get_ang(boi.position)) < VIEW_ANG;
 	}
 
 
 	tick(){
 
-		let o_pos, t_pos;
+		let avg_ang = 0;
+		let avg_pos = [0,0];
+		let total_local_boids = 0;
+
 		for(let b=0; b < Boid.totalBoids; b++){
 			if(Boid.boids[b] === this){
 				continue;
 			}
 
-			//align directions
-			this.dir += (this.ang_match(Boid.boids[b]) ? ROT_SCALE*this.speed : 1*-ROT_SCALE*this.speed);
-			this.dir = bound_ang(this.dir);
+			if(this.distance(Boid.boids[b]) < VIEW_DIST){ 	//within radius
+				if(this.within_sight(Boid.boids[b])){ 				//within vision
 
-			//calculate future positions
-			o_pos = Boid.boids[b].move(COLIDE_DEPTH);
-			t_pos = this.move(COLIDE_DEPTH);
+					//alignment
+					total_local_boids++;
+					avg_ang += Boid.boids[b].get_ang();
 
-			//if distance is too close, stear opposite way
-			if( dist(o_pos, t_pos) < COLIDE_LIMIT){
-				this.dir += (this.ang_match(Boid.boids[b]) ? ROT_SCALE*-2*Boid.totalBoids : ROT_SCALE*2*Boid.totalBoids);
+					//separation
+					this.turn(this.get_ang(Boid.boids[b].position),SEP_FORCE*(1-(this.distance(Boid.boids[b]) / VIEW_DIST)));
+
+					//cohesion
+					avg_pos[0] += Boid.boids[b].position[0];
+					avg_pos[1] += Boid.boids[b].position[1];
+
+
+				}
+
 			}
 		}
 
-		//aim towards center point
-		let c_dir = Math.atan2(Boid.centerPoint[1] - this.position[1], Boid.centerPoint[0] - this.position[0]);
-		//console.log(Boid.centerPoint[1] - this.position[1], Boid.centerPoint[0] - this.position[0]);
-		//console.log(c_dir);
-		//console.log("\n")
-		this.dir += (this.ang_match(c_dir+Math.PI) ? ROT_SCALE*Boid.totalBoids*this.speed*3 : ROT_SCALE*-3*Boid.totalBoids*this.speed);
+		if(total_local_boids > 0){
 
-		this.dir = bound_ang(this.dir);
-		this.position = this.move(1);
+			//Allignment
+			this.turn(avg_ang/total_local_boids,ALN_FORCE);
+
+			//Cohesion
+			avg_pos[0] = avg_pos[0] / total_local_boids;
+			avg_pos[1] = avg_pos[1] / total_local_boids;
+			this.turn(this.get_ang(avg_pos),COH_FORCE);
+
+		}
+
+		if(this.slowdown > 0) {
+			if(this.slowdown < 5){
+				this.velocity[0] *= 0.995;
+				this.velocity[1] *= 0.995;
+			}
+			this.slowdown--;
+		}
+
+		this.position[0] += this.velocity[0] * MOVE_SPEED;
+		this.position[1] += this.velocity[1] * MOVE_SPEED;
 
 	}
 
 	draw(ctx,offsetx,offsety){
 		ctx.save();
 		ctx.translate(offsetx+this.position[0], offsety+this.position[1]);
-		ctx.fillStyle = "rgba(0,0,0)";
-		ctx.fillRect(-10, -10, 20,20);
-		ctx.restore();
-	}
 
-	move(ticks){
-		return [this.position[0] + this.speed*Math.cos(this.dir)/4*ticks, this.position[1] + this.speed*Math.sin(this.dir)/4*ticks];
+		ctx.scale(0.05,0.05);
+		ctx.translate(this.img.width*0.025,this.img.height*0.025);
+		ctx.rotate(this.get_ang()-Math.PI/2);
+		ctx.translate(this.img.width/-2,this.img.height/-2);
+
+		ctx.drawImage(this.img, 0, 0);
+
+		ctx.restore();
 	}
 
 	kill(all=false){

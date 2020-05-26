@@ -75,10 +75,9 @@ function setUp(){
 	world.regenerate(RESOLUTION);
 	map = world.get(player.wx,player.wy);
 
-	new Boid(0,0,0,2);
-	new Boid(100,0,1,2);
-	new Boid(0,-100,-1,2);
-
+	for(let b=0;b<10;b++){
+		//new Boid(Math.round(Math.random()*100-50),Math.round(Math.random()*100-50),Math.round(Math.random()*6-3),Math.round(Math.random()*2),Math.round(Math.random()*2));
+	}
 
 	addEventListener("keydown",key_down);
 	addEventListener("keyup",key_up);
@@ -193,6 +192,10 @@ function game_tick(event){
 			player.particles[p].x = Math.round(player.rx - (player.x - player.particles[p].x));
 			player.particles[p].y = Math.round(player.ry - (player.y - player.particles[p].y));
 		}
+		for(let boi=0; boi<Boid.totalBoids; boi++){
+			Boid.boids[boi].position[0] = Math.round(player.rx - (player.x - Boid.boids[boi].position[0]));
+			Boid.boids[boi].position[1] = Math.round(player.ry - (player.y - Boid.boids[boi].position[1]));
+		}
 
 		player.x = Math.round(player.rx);
 		player.y = Math.round(player.ry);
@@ -263,8 +266,6 @@ function game_tick(event){
 
 	//random waves
 	if(player.speed > 4){
-		//player.xs += Math.sin(tickCount/10)*Math.cos(player.rot+Math.PI/2)*player.speed/48;
-		//player.ys += Math.sin(tickCount/10)*Math.sin(player.rot+Math.PI/2)*player.speed/48;
 
 		if(tickCount%240 === 0){
 			player.push = (Math.random()*0.01-0.005) * Math.PI;
@@ -274,12 +275,22 @@ function game_tick(event){
 		}
 	}
 
-	if(tickCount%60 === 0) {
-		calc_boid_center();
+	if(player.speed > 4 && Boid.totalBoids < 5) {
+		let num_new_boids = ran_b(5,20);
+		for(let n=0;n<num_new_boids;n++){
+			new Boid(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-100,100), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-100,100), Math.cos(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-2,2), Math.sin(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-2,2));
+		}
 	}
 
 	for(let b = 0; b < Boid.totalBoids; b++){
+		if(player.speed > 4 && Boid.boids[b].slowdown === 0 ){
+			Boid.boids[b].turn(Boid.boids[b].get_ang([player.x,player.y]),0.1);
+		}
 		Boid.boids[b].tick();
+		if((Math.abs(player.x-Boid.boids[b].position[0]) > MAX_X*3/4 || Math.abs(player.y-Boid.boids[b].position[1]) > MAX_Y*3/4) && Boid.boids[b].slowdown===0 ){
+			Boid.boids[b].kill();
+			b--;
+		}
 	}
 
 	player.rx = player.rx-player.xs;
