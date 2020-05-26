@@ -2,8 +2,8 @@ const ALN_FORCE = 0.0075;
 const COH_FORCE = 0.01;
 const SEP_FORCE = -0.001;
 
-const VIEW_DIST = 500;
-const VIEW_ANG = Math.PI/2;
+const VIEW_DIST = 250;
+const VIEW_ANG = Math.PI;
 
 const MOVE_SPEED = 0.1;
 
@@ -106,6 +106,10 @@ class Boid{
 				this.velocity[1] *= 0.995;
 			}
 			this.slowdown--;
+		}
+		else if(this.slowdown === -1 ){
+			this.velocity[0] *= 1.001;
+			this.velocity[1] *= 1.001;
 		}
 
 		this.position[0] += this.velocity[0] * MOVE_SPEED;

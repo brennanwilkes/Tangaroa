@@ -289,8 +289,14 @@ function game_tick(event){
 		Boid.boids[b].tick();
 		if(tickCount%10===0){
 			Boid.boids[b].ai_tick();
+			player.particles.push(new Particle(Boid.boids[b].position[0],Boid.boids[b].position[1], 0, 0, false, 50 , 4));
 		}
-		if((Math.abs(player.x-Boid.boids[b].position[0]) > MAX_X*3/4 || Math.abs(player.y-Boid.boids[b].position[1]) > MAX_Y*3/4) && Boid.boids[b].slowdown===0 ){
+
+		if(player.speed <= 1){
+			Boid.boids[b].slowdown=-1;
+		}
+
+		if((Math.abs(player.x-Boid.boids[b].position[0]) > MAX_X*3/4 || Math.abs(player.y-Boid.boids[b].position[1]) > MAX_Y*3/4) && Boid.boids[b].slowdown <= 0 ){
 			Boid.boids[b].kill();
 			b--;
 		}
