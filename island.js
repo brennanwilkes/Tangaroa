@@ -201,7 +201,6 @@ class Island{
 		if(this.type === 0){
 			this.gen_island_data();
 			this.gen_display_data(this.compress(this.resolution));
-			this.gen_ctx_img();
 		}
 	}
 
@@ -339,7 +338,6 @@ class Island{
 	regenerate(resolution){
 		this.resolution = resolution;
 		this.gen_display_data(this.compress(resolution));
-		this.gen_ctx_img();
 	}
 
 
@@ -514,6 +512,9 @@ class Island{
 
 
 	draw(ctx, offsetx, offsety){
+		if(this.canvas_img === undefined){
+			this.gen_ctx_img();
+		}
 		ctx.drawImage(this.canvas_img, offsetx, offsety);
 	}
 
@@ -551,7 +552,6 @@ class IslandCluster extends Island{
 
 		this.gen_cluster_data();
 		this.gen_display_data(this.compress(this.resolution));
-		this.gen_ctx_img();
 	}
 
 	gen_cluster_data(){
