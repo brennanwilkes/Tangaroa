@@ -52,9 +52,7 @@ class Boid{
 		return Math.abs(this.get_ang()-this.get_ang(boi.position)) < VIEW_ANG;
 	}
 
-
-	tick(){
-
+	ai_tick(){
 		let avg_ang = 0;
 		let avg_pos = [0,0];
 		let total_local_boids = 0;
@@ -95,6 +93,12 @@ class Boid{
 			this.turn(this.get_ang(avg_pos),COH_FORCE);
 
 		}
+	}
+
+
+	tick(){
+
+
 
 		if(this.slowdown > 0) {
 			if(this.slowdown < 5){

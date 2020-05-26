@@ -287,6 +287,9 @@ function game_tick(event){
 			Boid.boids[b].turn(Boid.boids[b].get_ang([player.x,player.y]),0.1);
 		}
 		Boid.boids[b].tick();
+		if(tickCount%10===0){
+			Boid.boids[b].ai_tick();
+		}
 		if((Math.abs(player.x-Boid.boids[b].position[0]) > MAX_X*3/4 || Math.abs(player.y-Boid.boids[b].position[1]) > MAX_Y*3/4) && Boid.boids[b].slowdown===0 ){
 			Boid.boids[b].kill();
 			b--;
