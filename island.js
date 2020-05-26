@@ -605,7 +605,7 @@ class IslandCluster extends Island{
 	}
 }
 
-var TRANSIT_ISLAND_SIZE = 1024;
+var TRANSIT_ISLAND_SIZE = 4096;
 
 class TransitIsland{
 	constructor(){

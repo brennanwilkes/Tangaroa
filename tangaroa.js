@@ -9,8 +9,6 @@
 const MAX_Y = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 const MAX_X = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
-const ISL_DEFAULT_SIZE = 2000;
-
 
 var canvas = document.getElementById("map");
 var ctx = canvas.getContext("2d");
