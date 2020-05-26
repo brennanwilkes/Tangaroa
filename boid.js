@@ -7,7 +7,7 @@ const VIEW_ANG = Math.PI;
 
 const MOVE_SPEED = 0.1;
 
-function dist(a,b){
+function boid_dist(a,b){
 	return Math.sqrt(Math.pow(a[0]-b[0],2)+Math.pow(a[1]-b[1],2));
 }
 
@@ -33,7 +33,7 @@ class Boid{
 	}
 
 	distance(boi){
-		return dist(this.position,boi.position);
+		return boid_dist(this.position,boi.position);
 	}
 
 	get_ang(pos){

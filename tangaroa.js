@@ -72,7 +72,7 @@ function setUp(){
 	player.particles = new Array();
 	player.events = new Array();
 
-	world = new Map(false,1);
+	world = new Map(false,3);
 	world.regenerate(RESOLUTION);
 	map = world.get(player.wx,player.wy);
 
