@@ -201,6 +201,7 @@ class Island{
 		if(this.type === 0){
 			this.gen_island_data();
 			this.gen_display_data(this.compress(this.resolution));
+			this.gen_ctx_img();
 		}
 	}
 
@@ -338,6 +339,7 @@ class Island{
 	regenerate(resolution){
 		this.resolution = resolution;
 		this.gen_display_data(this.compress(resolution));
+		this.gen_ctx_img();
 	}
 
 
@@ -509,19 +511,25 @@ class Island{
 		}
 	}
 
-	draw(ctx, offsetx, offsety){
 
-		ctx.save();
-		ctx.translate(offsetx, offsety);
+
+	draw(ctx, offsetx, offsety){
+		ctx.drawImage(this.canvas_img, offsetx, offsety);
+	}
+
+	gen_ctx_img(){
+		this.canvas_img = document.createElement('canvas');
+		this.canvas_img.width = this.size[0];
+		this.canvas_img.height = this.size[1];
+		this.ctx_img = this.canvas_img.getContext("2d");
 
 		for(let c=1;c<this.colours.length;c++){
-			ctx.fillStyle = this.colours[c];
+			this.ctx_img.fillStyle = this.colours[c];
 
 			for(let p=0;p<this.display_data[this.colours[c]].length;p++){
-				ctx.fillRect(this.display_data[this.colours[c]][p][0]*this.resolution, this.display_data[this.colours[c]][p][1]*this.resolution, this.display_data[this.colours[c]][p][3]*this.resolution, this.display_data[this.colours[c]][p][2]*this.resolution);
+				this.ctx_img.fillRect(this.display_data[this.colours[c]][p][0]*this.resolution, this.display_data[this.colours[c]][p][1]*this.resolution, this.display_data[this.colours[c]][p][3]*this.resolution, this.display_data[this.colours[c]][p][2]*this.resolution);
 			}
 		}
-		ctx.restore();
 	}
 	onbeach(x,y){
 		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[x][y] >= 0.3) && (this.raw_data[x][y] < 0.35);
@@ -543,6 +551,7 @@ class IslandCluster extends Island{
 
 		this.gen_cluster_data();
 		this.gen_display_data(this.compress(this.resolution));
+		this.gen_ctx_img();
 	}
 
 	gen_cluster_data(){

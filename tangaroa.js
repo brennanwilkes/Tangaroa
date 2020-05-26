@@ -278,15 +278,18 @@ function game_tick(event){
 		}
 	}
 
+	if(Boid.totalBoids > 0){
+		Boid.boids[tickCount%Boid.totalBoids].ai_tick();
+		player.particles.push(new Particle(Boid.boids[tickCount%Boid.totalBoids].position[0],Boid.boids[tickCount%Boid.totalBoids].position[1], 0, 0, false, 50 , 4));
+	}
+
+
 	for(let b = 0; b < Boid.totalBoids; b++){
 		if(player.speed > 4 && Boid.boids[b].slowdown === 0 ){
 			Boid.boids[b].turn(Boid.boids[b].get_ang([player.x,player.y]),0.1);
 		}
 		Boid.boids[b].tick();
-		if(tickCount%10===0){
-			Boid.boids[b].ai_tick();
-			player.particles.push(new Particle(Boid.boids[b].position[0],Boid.boids[b].position[1], 0, 0, false, 50 , 4));
-		}
+
 
 		if(player.speed <= 1){
 			Boid.boids[b].slowdown=-1;
