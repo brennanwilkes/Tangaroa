@@ -1,6 +1,6 @@
-const ALN_FORCE = 0.0075;
+const ALN_FORCE = 0.0125;
 const COH_FORCE = 0.01;
-const SEP_FORCE = -0.001;
+const SEP_FORCE = -0.02;
 
 const VIEW_DIST = 250;
 const VIEW_ANG = Math.PI;
@@ -48,6 +48,11 @@ class Boid{
 		this.velocity[1] += force * Math.sin(ang);
 	}
 
+	match_vel(vel, force){
+		this.velocity[0] += force * (vel[0] - this.velocity[0]);
+		this.velocity[1] += force * (vel[1] - this.velocity[1]);
+	}
+
 	within_sight(boi){
 		return Math.abs(this.get_ang()-this.get_ang(boi.position)) < VIEW_ANG;
 	}
@@ -70,7 +75,8 @@ class Boid{
 					avg_ang += Boid.boids[b].get_ang();
 
 					//separation
-					this.turn(this.get_ang(Boid.boids[b].position),SEP_FORCE*(1-(this.distance(Boid.boids[b]) / VIEW_DIST)));
+					//console.log((1-(this.distance(Boid.boids[b]) / VIEW_DIST)),Math.pow((1-(this.distance(Boid.boids[b]) / VIEW_DIST)),0.5))
+					this.turn(this.get_ang(Boid.boids[b].position),SEP_FORCE*Math.pow((1-(this.distance(Boid.boids[b]) / VIEW_DIST)),0.1));
 
 					//cohesion
 					avg_pos[0] += Boid.boids[b].position[0];

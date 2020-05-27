@@ -62,7 +62,7 @@ function setUp(){
 	player.particles = new Array();
 	player.events = new Array();
 
-	world = new Map(false,25);
+	world = new Map(true);
 	map = world.get(player.wx,player.wy);
 
 
@@ -282,6 +282,11 @@ function game_tick(event){
 	for(let b = 0; b < Boid.totalBoids; b++){
 		if(player.speed > 4 && Boid.boids[b].slowdown === 0 ){
 			Boid.boids[b].turn(Boid.boids[b].get_ang([player.x,player.y]),0.1);
+			Boid.boids[b].turn(player.rot,0.05);
+			Boid.boids[b].match_vel([player.xs,player.ys],0.0005);
+		}
+		else if(Boid.boids[b].slowdown === 0){
+			Boid.boids[b].turn(Boid.boids[b].get_ang([player.x,player.y]),-0.1);
 		}
 		Boid.boids[b].tick();
 
