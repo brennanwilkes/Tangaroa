@@ -90,7 +90,7 @@ class Map{
 
 		ctx.fillStyle = "#654321";
 		ctx.fillRect(w-10,h-10,sqr*this.size+20,sqr*this.size+20);
-		ctx.fillStyle = "#957351";
+		ctx.fillStyle = "DarkBlue";
 		ctx.fillRect(w,h,sqr*this.size,sqr*this.size);
 		ctx.fillStyle = "#604321";
 		ctx.strokeStyle = "#453311";
@@ -98,28 +98,15 @@ class Map{
 
 		let b_x, b_y;
 
+		let tmp_isl;
+
 		for(let x=0; x<this.size;x++){
 			for(let y=0; y<this.size;y++){
 				if(this.raw_data[x][y] === 1){
-					b_x = Math.round(w+x*sqr+sqr/2);
-					b_y = Math.round(h+y*sqr+sqr/2);
-					if(this.islands[x][y].type === 0){
-						ctx.beginPath();
-						ctx.arc(b_x,b_y, Math.round(sqr/2.5), 0, 2 * Math.PI);
-						ctx.fill();
-						ctx.stroke();
-					}
-					else{
-						for(let i=-1;i<2;i+=2){
-							for(let j=-1;j<2;j+=2){
-								ctx.beginPath();
-								ctx.arc(Math.round(b_x+(i*sqr/4)),Math.round(b_y+(j*sqr/4)), Math.round(sqr/5), 0, 2 * Math.PI);
-								ctx.fill();
-								ctx.stroke();
-							}
-						}
-					}
-
+					b_x = Math.round(w+x*sqr);
+					b_y = Math.round(h+y*sqr);
+					tmp_isl = new IslandCopy(this.get(x,y),sqr);
+					tmp_isl.draw(ctx,b_x,b_y);
 				}
 			}
 		}

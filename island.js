@@ -158,60 +158,28 @@ function generate_random_island(settings=new IslandSettings()){
 	}
 }
 
-
-class Island{
-	constructor(type=0, seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0, LAC_SCALE_DOWN=1, GEN_TOWN=0) {
-
-		this.replicable_seed = seed;
-		this.seed = hash(seed);
-
-		this.type = (type===-1 ? 0 : type);
-
-		this.town = [-1,-1];
-		this.visited = false;
-
-		this.has_volcano = false;
-		this.name = NAMES_LIST[hash(seed*seed)%NAMES_LIST.length];
-
-		this.x = x;
-		this.y = y;
-
-		this.size = [size_x,size_y];
-		const size_type = [SIZES,CLUSTER_SIZES];
-		let temp = hash(seed)%size_type[this.type].length;
-		if(this.size[0] === -1){
-			this.size[0] = size_type[this.type][temp + (temp+3 >= size_type[this.type].length ? 0 : hash(seed+2)%4)];
-		}
-		if(this.size[1] === -1){
-			this.size[1] = size_type[this.type][temp + (temp+3 >= size_type[this.type].length ? 0 : hash(seed+1)%4)];
-		}
-
-		this.size.push(normalize((this.size[0]+this.size[1])/2,SIZES[0],SIZES[SIZES.length-1]));
-
+class IslandCopy{
+	constructor(isl,size){
 		this.colours = ["DarkBlue","#2D5BA4","#297900","#145900","#093900","#D0AB76","#654321","slategrey","#222222","darkred","orange"];
-
-		this.LAC_SCALE_DOWN = LAC_SCALE_DOWN;
-		this.GEN_TOWN = GEN_TOWN;
-
 		this.raw_data;
 		this.display_data;
 
-		if(this.type === 0){
-			this.gen_island_data();
-		}
-		if(type === 0){
-			this.raw_data = this.compress(4);
-			this.gen_display_data(this.raw_data);
+		if(isl !== undefined){
+			this.is_map_island = true;
+			this.size = size;
+			this.raw_data = isl.raw_data;
+			this.gen_display_data(this.compress(Math.ceil(Math.min(this.raw_data.length,this.raw_data[0].length)*4/this.size)));
 		}
 	}
-
 	compress(factor){
 		if(factor===1){
 			return this.raw_data;
 		}
 
-		const n_x = this.size[0]/factor;
-		const n_y = this.size[1]/factor;
+
+
+		const n_x = Math.floor(this.raw_data.length/factor);
+		const n_y = Math.floor(this.raw_data[0].length/factor);
 
 		let comp = new Array(n_x);
 		for(let i=0;i<n_x;i++){
@@ -219,11 +187,6 @@ class Island{
 			for(let j=0;j<n_y;j++){
 				comp[i][j] = 0;
 			}
-		}
-
-		let pixel = new Array(factor);
-		for(let i=0;i<factor;i++){
-			pixel[i] = new Array(factor);
 		}
 
 		for(let x=0;x<n_x;x++){
@@ -335,10 +298,12 @@ class Island{
 		}
 	}
 
-
-
-
-
+	draw(ctx, offsetx, offsety){
+		if(this.canvas_img === undefined){
+			this.gen_ctx_img();
+		}
+		ctx.drawImage(this.canvas_img, offsetx, offsety);
+	}
 
 	blend(island,x,y){
 		for(let i=0; i<island.size[0]/4; i++){
@@ -505,25 +470,20 @@ class Island{
 
 					}
 				}
-
-
 			}
 		}
 	}
 
-
-
-	draw(ctx, offsetx, offsety){
-		if(this.canvas_img === undefined){
-			this.gen_ctx_img();
-		}
-		ctx.drawImage(this.canvas_img, offsetx, offsety);
-	}
-
 	gen_ctx_img(){
 		this.canvas_img = document.createElement('canvas');
-		this.canvas_img.width = this.size[0];
-		this.canvas_img.height = this.size[1];
+		if(this.is_map_island){
+			this.canvas_img.width = this.size;
+			this.canvas_img.height = this.size;
+		}
+		else{
+			this.canvas_img.width = this.size[0];
+			this.canvas_img.height = this.size[1];
+		}
 		let ctx_img = this.canvas_img.getContext("2d");
 
 		for(let c=1;c<this.colours.length;c++){
@@ -534,6 +494,56 @@ class Island{
 			}
 		}
 	}
+
+}
+
+
+class Island extends IslandCopy{
+	constructor(type=0, seed=Math.random()*1000000, size_x=-1, size_y=-1, x=0, y=0, LAC_SCALE_DOWN=1, GEN_TOWN=0) {
+
+		super();
+
+		this.replicable_seed = seed;
+		this.seed = hash(seed);
+
+		this.type = (type===-1 ? 0 : type);
+
+		this.town = [-1,-1];
+		this.visited = false;
+
+		this.has_volcano = false;
+		this.name = NAMES_LIST[hash(seed*seed)%NAMES_LIST.length];
+
+		this.x = x;
+		this.y = y;
+
+		this.size = [size_x,size_y];
+		const size_type = [SIZES,CLUSTER_SIZES];
+		let temp = hash(seed)%size_type[this.type].length;
+		if(this.size[0] === -1){
+			this.size[0] = size_type[this.type][temp + (temp+3 >= size_type[this.type].length ? 0 : hash(seed+2)%4)];
+		}
+		if(this.size[1] === -1){
+			this.size[1] = size_type[this.type][temp + (temp+3 >= size_type[this.type].length ? 0 : hash(seed+1)%4)];
+		}
+
+		this.size.push(normalize((this.size[0]+this.size[1])/2,SIZES[0],SIZES[SIZES.length-1]));
+
+
+		this.LAC_SCALE_DOWN = LAC_SCALE_DOWN;
+		this.GEN_TOWN = GEN_TOWN;
+
+
+
+		if(this.type === 0){
+			this.gen_island_data();
+		}
+		if(type === 0){
+			this.raw_data = this.compress(4);
+			this.gen_display_data(this.raw_data);
+		}
+	}
+
 	onbeach(x,y){
 		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[Math.floor(x/4)][Math.floor(y/4)] >= 0.3) && (this.raw_data[Math.floor(x/4)][Math.floor(y/4)] < 0.35);
 	}
