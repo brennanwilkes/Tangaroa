@@ -2,6 +2,10 @@ const ALN_FORCE = 0.0125;
 const COH_FORCE = 0.01;
 const SEP_FORCE = -0.02;
 
+const PLAYER_ALN_FORCE = 0.05;
+const PLAYER_COH_FORCE = 0.1;
+const PLAYER_VEL_FORCE = 0.0005;
+
 const VIEW_DIST = 250;
 const VIEW_ANG = Math.PI;
 
@@ -22,6 +26,8 @@ class Boid{
 		this.position = [x, y];
 		this.velocity = [xs, ys];
 		this.dir = bound_ang(this.get_ang(this.velocity));
+
+		this.flee = false;
 
 		this.img = new Image();
 		this.img.src = "boid.png";
@@ -55,6 +61,18 @@ class Boid{
 
 	within_sight(boi){
 		return Math.abs(this.get_ang()-this.get_ang(boi.position)) < VIEW_ANG;
+	}
+
+	player_tick(player){
+		if(this.flee){
+			this.turn(this.get_ang([player.x,player.y]),-1*PLAYER_COH_FORCE);
+			this.turn(player.rot+(this.get_ang() > player.rot ? Math.PI/2 : Math.PI/-2),2*PLAYER_ALN_FORCE);
+		}
+		else{
+			this.turn(this.get_ang([player.x,player.y]),PLAYER_COH_FORCE);
+			this.turn(player.rot,PLAYER_ALN_FORCE);
+			this.match_vel([player.xs,player.ys],PLAYER_VEL_FORCE);
+		}
 	}
 
 	ai_tick(){
@@ -103,9 +121,6 @@ class Boid{
 
 
 	tick(){
-
-
-
 		if(this.slowdown > 0) {
 			if(this.slowdown < 5){
 				this.velocity[0] *= 0.995;

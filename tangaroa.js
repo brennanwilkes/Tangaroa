@@ -62,7 +62,7 @@ function setUp(){
 	player.particles = new Array();
 	player.events = new Array();
 
-	world = new Map(true);
+	world = new Map(false,1);
 	map = world.get(player.wx,player.wy);
 
 
@@ -188,6 +188,13 @@ function game_tick(event){
 			Boid.boids[boi].position[1] = Math.round(player.ry - (player.y - Boid.boids[boi].position[1]));
 		}
 
+		if(!map.is_transit){
+			for(let b = 0; b < Boid.totalBoids; b++){
+				Boid.boids[b].flee = true;
+			}
+		}
+
+
 		player.x = Math.round(player.rx);
 		player.y = Math.round(player.ry);
 
@@ -273,21 +280,19 @@ function game_tick(event){
 		}
 	}
 
+	//let tmp_boi = Boid.boids[tickCount%Boid.totalBoids];
 	if(Boid.totalBoids > 0){
 		Boid.boids[tickCount%Boid.totalBoids].ai_tick();
-		player.particles.push(new Particle(Boid.boids[tickCount%Boid.totalBoids].position[0],Boid.boids[tickCount%Boid.totalBoids].position[1], 0, 0, false, 50 , 4));
+		//player.particles.push(new Particle(tmp_boi.position[0],tmp_boi.position[1], 0, 0, false, 50 , 6));
 	}
 
 
 	for(let b = 0; b < Boid.totalBoids; b++){
-		if(player.speed > 4 && Boid.boids[b].slowdown === 0 ){
-			Boid.boids[b].turn(Boid.boids[b].get_ang([player.x,player.y]),0.1);
-			Boid.boids[b].turn(player.rot,0.05);
-			Boid.boids[b].match_vel([player.xs,player.ys],0.0005);
+		if(Boid.boids[b].slowdown === 0){
+			Boid.boids[b].flee = (Boid.boids[b].flee || player.speed < 4);
+			Boid.boids[b].player_tick(player);
 		}
-		else if(Boid.boids[b].slowdown === 0){
-			Boid.boids[b].turn(Boid.boids[b].get_ang([player.x,player.y]),-0.1);
-		}
+
 		Boid.boids[b].tick();
 
 
