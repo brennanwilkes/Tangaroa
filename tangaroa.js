@@ -13,8 +13,6 @@ const MAX_X = Math.max(document.documentElement.clientWidth, window.innerWidth |
 var canvas = document.getElementById("map");
 var ctx = canvas.getContext("2d");
 
-const Resolution = Object.freeze({"ultralow":8,"low":4, "medium":2, "high":1})
-var RESOLUTION = Resolution.low;
 
 var map;
 var world;
@@ -22,12 +20,6 @@ var player;
 var intervalID;
 var tickCount = 0;
 
-var resolutionSlider = document.getElementById("resolution");
-resolutionSlider.oninput = function() {
-	RESOLUTION = {"1":Resolution.ultralow,"2":Resolution.low,"3":Resolution.medium,"4":Resolution.high}[this.value];
-	map.regenerate(RESOLUTION);
-	draw_screen();
-}
 
 function clear_screen(){
 	ctx.fillStyle = map.colours[0];

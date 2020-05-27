@@ -9,17 +9,6 @@ body{
 	position: relative;
 }
 
-#resolutionBlock{
-	display:none;
-	position: absolute;
-	right:5vw;
-	top:5vh;
-	z-index: 1;
-	font-size: 24pt;
-	line-height: 100%;
-	color:white;
-}
-
 canvas{
 	position:absolute;
 	left:0;
