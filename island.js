@@ -165,7 +165,7 @@ class Island{
 		this.replicable_seed = seed;
 		this.seed = hash(seed);
 
-		this.type = type;
+		this.type = (type===-1 ? 0 : type);
 
 		this.town = [-1,-1];
 		this.visited = false;
@@ -175,8 +175,6 @@ class Island{
 
 		this.x = x;
 		this.y = y;
-
-		this.resolution = 1;
 
 		this.size = [size_x,size_y];
 		const size_type = [SIZES,CLUSTER_SIZES];
@@ -200,7 +198,10 @@ class Island{
 
 		if(this.type === 0){
 			this.gen_island_data();
-			this.gen_display_data(this.compress(this.resolution));
+		}
+		if(type === 0){
+			this.raw_data = this.compress(4);
+			this.gen_display_data(this.raw_data);
 		}
 	}
 
@@ -335,10 +336,7 @@ class Island{
 	}
 
 
-	regenerate(resolution){
-		this.resolution = resolution;
-		this.gen_display_data(this.compress(resolution));
-	}
+
 
 
 
@@ -522,22 +520,22 @@ class Island{
 		this.canvas_img = document.createElement('canvas');
 		this.canvas_img.width = this.size[0];
 		this.canvas_img.height = this.size[1];
-		this.ctx_img = this.canvas_img.getContext("2d");
+		let ctx_img = this.canvas_img.getContext("2d");
 
 		for(let c=1;c<this.colours.length;c++){
-			this.ctx_img.fillStyle = this.colours[c];
+			ctx_img.fillStyle = this.colours[c];
 
 			for(let p=0;p<this.display_data[this.colours[c]].length;p++){
-				this.ctx_img.fillRect(this.display_data[this.colours[c]][p][0]*this.resolution, this.display_data[this.colours[c]][p][1]*this.resolution, this.display_data[this.colours[c]][p][3]*this.resolution, this.display_data[this.colours[c]][p][2]*this.resolution);
+				ctx_img.fillRect(this.display_data[this.colours[c]][p][0]*4, this.display_data[this.colours[c]][p][1]*4, this.display_data[this.colours[c]][p][3]*4, this.display_data[this.colours[c]][p][2]*4);
 			}
 		}
 	}
 	onbeach(x,y){
-		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[x][y] >= 0.3) && (this.raw_data[x][y] < 0.35);
+		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[Math.floor(x/4)][Math.floor(y/4)] >= 0.3) && (this.raw_data[Math.floor(x/4)][Math.floor(y/4)] < 0.35);
 	}
 
 	onground(x, y){
-		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[x][y] >= 0.35);
+		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[Math.floor(x/4)][Math.floor(y/4)] >= 0.35);
 	}
 
 	attown(x, y){
@@ -551,7 +549,8 @@ class IslandCluster extends Island{
 		super(1,seed,size_x,size_y,x,y,LAC_SCALE_DOWN);
 
 		this.gen_cluster_data();
-		this.gen_display_data(this.compress(this.resolution));
+		this.raw_data = this.compress(4);
+		this.gen_display_data(this.raw_data);
 	}
 
 	gen_cluster_data(){
@@ -620,7 +619,6 @@ class TransitIsland{
 	constructor(){
 		this.colours = ["darkblue"];
 		this.has_volcano = 0;
-		this.resolution = 4;
 		this.size = [TRANSIT_ISLAND_SIZE,TRANSIT_ISLAND_SIZE];
 
 		this.is_transit = true;
@@ -635,7 +633,6 @@ class TransitIsland{
 	}
 
 	draw(ctx, offsetx, offsety){}
-	regenerate(resolution){}
 	onbeach(x,y){
 		return false;
 	}

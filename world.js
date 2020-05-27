@@ -83,16 +83,6 @@ class Map{
 		return (this.raw_data[x][y] === 1 ? this.islands[x][y] : this.transit_island);
 	}
 
-	regenerate(res){
-		for(let x=0; x<this.size;x++){
-			for(let y=0; y<this.size;y++){
-				if(this.raw_data[x][y] === 1){
-					this.islands[x][y].regenerate(res);
-				}
-			}
-		}
-	}
-
 	draw(ctx){
 		let sqr = Math.round(Math.min(ctx.canvas.width,ctx.canvas.height)*0.75 / this.size);
 		let w = Math.round(ctx.canvas.width/2-(sqr*this.size/2));

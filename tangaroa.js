@@ -70,8 +70,7 @@ function setUp(){
 	player.particles = new Array();
 	player.events = new Array();
 
-	world = new Map(false,15);
-	world.regenerate(RESOLUTION);
+	world = new Map(false,1);
 	map = world.get(player.wx,player.wy);
 
 
@@ -155,7 +154,6 @@ function game_tick(event){
 	if((player.rx < Math.max(MAX_X,map.size[0])*-1) || (player.rx > Math.max(MAX_X,map.size[0])*2) || (player.ry < Math.max(MAX_Y,map.size[1])*-1) || (player.ry > Math.max(MAX_Y,map.size[1])*2)){
 
 		if(!map.is_transit){
-			delete map.ctx_img;
 			delete map.canvas_img;
 		}
 

@@ -10,6 +10,7 @@ body{
 }
 
 #resolutionBlock{
+	display:none;
 	position: absolute;
 	right:5vw;
 	top:5vh;
