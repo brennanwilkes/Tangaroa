@@ -62,7 +62,7 @@ function setUp(){
 	player.particles = new Array();
 	player.events = new Array();
 
-	world = new Map(false,1);
+	world = new Map(false,25);
 	map = world.get(player.wx,player.wy);
 
 

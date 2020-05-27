@@ -341,8 +341,8 @@ class Island{
 
 
 	blend(island,x,y){
-		for(let i=0; i<island.size[0]; i++){
-			for(let j=0; j<island.size[1]; j++){
+		for(let i=0; i<island.size[0]/4; i++){
+			for(let j=0; j<island.size[1]/4; j++){
 				if(island.raw_data[i][j] > 0.1){
 					this.raw_data[x+i][y+j] = island.raw_data[i][j];
 				}
