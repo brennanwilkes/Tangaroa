@@ -1,4 +1,5 @@
-
+var scrollId;
+var scrollAmt;
 
 function QuickPlay(event){
 	world = new Map(true);
@@ -9,6 +10,8 @@ function NewGame(event){
 	world = new Map(false,3);
 	start_game();
 }
+
+
 
 function start_game(){
 	let menu = document.getElementsByClassName("menu");
@@ -27,4 +30,25 @@ function start_game(){
 	addEventListener("keyup",key_up);
 	clearInterval(intervalID);
 	intervalID = setInterval(tick,4);
+}
+
+function About(){
+	scrollAmt = 95;
+	scrollId = setInterval(scroll,4,1);
+}
+
+function Back(){
+	scrollAmt = 95;
+	scrollId = setInterval(scroll,4,-1);
+}
+
+function scroll(mult){
+	let menu = document.getElementsByClassName("menu");
+	for(let i=0;i<menu.length;i++){
+		menu[i].style.top = getComputedStyle(menu[i]).top.substring(0,getComputedStyle(menu[i]).top.length-2)-(MAX_Y/100*mult)+"px";
+	}
+	scrollAmt--;
+	if(scrollAmt <= 0){
+		clearInterval(scrollId,mult);
+	}
 }
