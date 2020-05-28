@@ -17,12 +17,16 @@ var ctx = canvas.getContext("2d");
 var map;
 var world;
 var player;
+var menu_target;
 var intervalID;
 var tickCount = 0;
 
 
-function clear_screen(){
-	ctx.fillStyle = map.colours[0];
+function clear_screen(colour){
+	if(colour === undefined){
+		colour = map.colours[0];
+	}
+	ctx.fillStyle = colour;
 	ctx.fillRect(0,0,MAX_X,MAX_Y);
 }
 
@@ -60,16 +64,8 @@ function setUp(){
 	player.space = false;
 
 	player.particles = new Array();
-	player.events = new Array();
 
-	world = new Map(false,5);
-	map = world.get(player.wx,player.wy);
-
-
-	addEventListener("keydown",key_down);
-	addEventListener("keyup",key_up);
-	intervalID = setInterval(tick,4);
-
+	intervalID = setInterval(menu_tick,4);
 }
 
 function key_down(event){
@@ -122,9 +118,56 @@ function draw_screen(){
 	ctx.drawImage(player.img, 0, 0);
 	ctx.restore();
 
-
-
 }
+
+function menu_tick(){
+	if(tickCount%10===0){
+		player.particles.push(new Particle(ran_b(MAX_X/-2,MAX_X/2),ran_b(MAX_Y/-2,MAX_Y/2), 0, 0, false, 400 , 4));
+	}
+
+	//clear and respawn boids
+	if(tickCount%2500===0){
+		if(Boid.totalBoids > 0){
+			Boid.boids[0].kill(true);
+		}
+		let num_new_boids = ran_b(5,20);
+		let sx = ran_b(0,1) === 0 ? -1 : 1;
+		let sy = ran_b(0,1) === 0 ? -1 : 1;
+
+		menu_target = [sx*MAX_X*-2/3,sy*MAX_Y*-2/3];
+
+		for(let n=0;n<num_new_boids;n++){
+			new Boid(sx*MAX_X*2/3 + ran_b(-100,100), sy*MAX_X*2/3 + ran_b(-100,100),sx*-1,sy*-1,0);
+		}
+		Boid.boids[0].img.src = "canoe.png";
+	}
+
+	Boid.boids[tickCount%Boid.totalBoids].ai_tick();
+	for(let b = 0; b < Boid.totalBoids; b++){
+		Boid.boids[b].target_tick(menu_target);
+		Boid.boids[b].tick();
+	}
+
+
+
+
+	clear_screen("DarkBlue");
+
+	for(let p = 0; p < player.particles.length; p++){
+		if(player.particles[p].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2)){
+			player.particles.splice(p, 1);
+			p--;
+		}
+	}
+
+	for(let b = 0; b < Boid.totalBoids; b++){
+		Boid.boids[b].draw(ctx,MAX_X/2,MAX_Y/2);
+	}
+
+
+	tickCount++;
+}
+
 
 function tick(event){
 	if(player.space){
@@ -276,7 +319,7 @@ function game_tick(event){
 	if(player.speed > 4 && Boid.totalBoids < 5 && map.is_transit) {
 		let num_new_boids = ran_b(5,20);
 		for(let n=0;n<num_new_boids;n++){
-			new Boid(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-100,100), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-100,100), Math.cos(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-2,2), Math.sin(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-2,2));
+			new Boid(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-100,100), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-100,100), Math.cos(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-2,2), Math.sin(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-2,2),360);
 		}
 	}
 
@@ -313,7 +356,7 @@ function game_tick(event){
 	player.y = Math.round(player.ry);
 
 
-	draw_screen()
+	draw_screen();
 
 
 	player.onbeach = map.onbeach(player.x,player.y);

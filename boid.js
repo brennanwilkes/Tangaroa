@@ -4,7 +4,11 @@ const SEP_FORCE = -0.02;
 
 const PLAYER_ALN_FORCE = 0.05;
 const PLAYER_COH_FORCE = 0.1;
-const PLAYER_VEL_FORCE = 0.0005;
+const PLAYER_VEL_FORCE = 0.005;
+
+const TARGET_RAN_FORCE = 0.2;
+const TARGET_FORCE = 0.05;
+const TARGET_VEL_FORCE = 0.001;
 
 const VIEW_DIST = 250;
 const VIEW_ANG = Math.PI;
@@ -21,7 +25,7 @@ function bound_ang(a){
 
 class Boid{
 
-	constructor(x, y, xs, ys){
+	constructor(x, y, xs, ys, slowdown){
 
 		this.position = [x, y];
 		this.velocity = [xs, ys];
@@ -32,7 +36,7 @@ class Boid{
 		this.img = new Image();
 		this.img.src = "boid.png";
 
-		this.slowdown = 360;
+		this.slowdown = slowdown;
 
 		Boid.boids.push(this);
 		Boid.totalBoids++;
@@ -61,6 +65,12 @@ class Boid{
 
 	within_sight(boi){
 		return Math.abs(this.get_ang()-this.get_ang(boi.position)) < VIEW_ANG;
+	}
+
+	target_tick(target,target_vel){
+		this.turn(this.get_ang([target[0],target[1]]),TARGET_FORCE);
+		this.turn(this.get_ang([this.position[0]+ran_b(-1000,1000),this.position[1]+ran_b(-1000,1000)]),TARGET_RAN_FORCE);
+		this.match_vel([0,0],TARGET_VEL_FORCE);
 	}
 
 	player_tick(player){

@@ -10,9 +10,14 @@
 		<script src="particle.js" type="text/javascript" defer></script>
 		<script src="boid.js" type="text/javascript" defer></script>
 		<script src="tangaroa.js" type="text/javascript" defer></script>
+		<script src="menu.js" type="text/javascript" defer></script>
 		<link rel="stylesheet" href="style.css">
 	</head>
 	<body onload="setUp()">
 		<canvas id="map"></canvas>
+		<span class="menu" id="Title">Tangaroa</span>
+		<button class="menu" id="QuickPlay" onclick="QuickPlay()">Quick Play</button>
+		<button class="menu" id="NewGame" onclick="NewGame()">New Game</button>
+		<button class="menu" id="About" onclick="About()">About</button>
 	</body>
 </html>
