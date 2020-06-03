@@ -169,9 +169,8 @@ const ISL_OCT = 8;
 const ISL_PERSIST = 2;
 const ISL_LAC = 0.7;
 
-const ISLAND_PIXEL_SCALE = 8;
+const ISLAND_PIXEL_SCALE = 4;
 var LIGHTING_DISTANCE = 1;
-var LIGHTING_ANGLE = Math.PI/4;
 
 
 const TOWN_HEIGHT = 0.36;
@@ -576,7 +575,7 @@ class IslandCopy{
 					nextpeak = [xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h];
 				}
 
-				if( peak!=undefined && colour_round(peak[2]) > 3 && colour_round(peak[2]) > colour_round(h)){
+				if( peak!=undefined && colour_round(peak[2]) > 2 && colour_round(peak[2]) > colour_round(h)){
 					ctx_img.fillStyle = "rgba(0, 0, 0, "+get_lighting(peak,[xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h])+")";
 					ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
 

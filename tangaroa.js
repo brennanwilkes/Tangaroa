@@ -358,8 +358,7 @@ function game_tick(event){
 	player.x = Math.round(player.rx);
 	player.y = Math.round(player.ry);
 
-	if(tickCount%100 === 0 && !map.is_transit && !map.is_map_island){
-		//LIGHTING_ANGLE = (LIGHTING_ANGLE + Math.PI/128)%(Math.PI/2);
+	if(tickCount%250 === 0 && !map.is_transit && !map.is_map_island){
 		LIGHTING_DISTANCE = 1 + (LIGHTING_DISTANCE += 10)%250;
 		map.bake_lighting();
 	}
