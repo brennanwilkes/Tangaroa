@@ -160,7 +160,8 @@ function generate_random_island(settings=new IslandSettings()){
 
 class IslandCopy{
 	constructor(isl,size){
-		this.colours = ["DarkBlue","#2D5BA4","#297900","#145900","#093900","#D0AB76","#654321","slategrey","#222222","darkred","orange"];
+		//this.colours = ["DarkBlue","#2D5BA4","#297900","#145900","#093900","#D0AB76","#654321","slategrey","#222222","darkred","orange"];
+		this.colours = [DEEP_OCEAN, SHALLOW_OCEAN, LAND_ONE, LAND_TWO, LAND_THREE, BEACH, VILLAGE, ROCK_ONE, ROCK_TWO, LAVA_ONE, LAVA_TWO];
 		this.raw_data;
 		this.display_data;
 
@@ -206,30 +207,30 @@ class IslandCopy{
 		this.display_data = new Array();
 
 		//lightblue
-		this.display_data["#2D5BA4"] = new Array();
+		this.display_data[SHALLOW_OCEAN] = new Array();
 
 		//green
-		this.display_data["#297900"] = new Array();
+		this.display_data[LAND_ONE] = new Array();
 
 		//green
-		this.display_data["#145900"] = new Array();
+		this.display_data[LAND_TWO] = new Array();
 
 		//green
-		this.display_data["#093900"] = new Array();
+		this.display_data[LAND_THREE] = new Array();
 
 		//beach
-		this.display_data["#D0AB76"] = new Array();
+		this.display_data[BEACH] = new Array();
 
 		//town
-		this.display_data["#654321"] = new Array();
+		this.display_data[VILLAGE] = new Array();
 
 		//mountain
-		this.display_data["slategrey"] = new Array();
-		this.display_data["#222222"] = new Array();
+		this.display_data[ROCK_ONE] = new Array();
+		this.display_data[ROCK_TWO] = new Array();
 
 		//volcano
-		this.display_data["darkred"] = new Array();
-		this.display_data["orange"] = new Array();
+		this.display_data[LAVA_ONE] = new Array();
+		this.display_data[LAVA_TWO] = new Array();
 
 		for(let x=0;x<raw_data.length;x++){
 			for(let y=0;y<raw_data[0].length;y++){
@@ -238,34 +239,34 @@ class IslandCopy{
 					continue;
 				}
 				else if(raw_data[x][y]<0.3){
-					this.display_data["#2D5BA4"].push([x,y]);
+					this.display_data[SHALLOW_OCEAN].push([x,y]);
 				}
 				else if(raw_data[x][y] < 0.35){
-					this.display_data["#D0AB76"].push([x,y]);
+					this.display_data[BEACH].push([x,y]);
 				}
 				else if(raw_data[x][y] === TOWN_HEIGHT){
-					this.display_data["#654321"].push([x,y]);
+					this.display_data[VILLAGE].push([x,y]);
 				}
 				else if(raw_data[x][y] < 0.45){
-					this.display_data["#297900"].push([x,y]);
+					this.display_data[LAND_ONE].push([x,y]);
 				}
 				else if(raw_data[x][y] < 0.6){
-					this.display_data["#145900"].push([x,y]);
+					this.display_data[LAND_TWO].push([x,y]);
 				}
 				else if(raw_data[x][y] < 0.75){
-					this.display_data["#093900"].push([x,y]);
+					this.display_data[LAND_THREE].push([x,y]);
 				}
 				else if(raw_data[x][y] < 0.9 && raw_data[x][y] > 0.89){
-					this.display_data["#222222"].push([x,y]);
+					this.display_data[ROCK_ONE].push([x,y]);
 				}
 				else if(raw_data[x][y] < 0.925){
-					this.display_data["slategrey"].push([x,y]);
+					this.display_data[ROCK_TWO].push([x,y]);
 				}
 				else if(raw_data[x][y] < 1.1){
-					this.display_data["darkred"].push([x,y]);
+					this.display_data[LAVA_ONE].push([x,y]);
 				}
 				else{
-					this.display_data["orange"].push([x,y]);
+					this.display_data[LAVA_TWO].push([x,y]);
 				}
 			}
 		}
@@ -631,7 +632,7 @@ var TRANSIT_ISLAND_SIZE = 4096;
 
 class TransitIsland{
 	constructor(){
-		this.colours = ["darkblue"];
+		this.colours = [DEEP_OCEAN];
 		this.has_volcano = 0;
 		this.size = [TRANSIT_ISLAND_SIZE,TRANSIT_ISLAND_SIZE];
 

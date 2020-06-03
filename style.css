@@ -1,19 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Inconsolata|Muli&display=swap');
 
-/*
-	DarkBlue
-	#2D5BA4
-	#297900
-	#145900
-	#093900
-	#D0AB76
-	#654321
-	slategrey
-	#222222
-	darkred
-	orange
-*/
-
 * {
 	padding: 0;
 	margin: 0;
@@ -58,7 +44,7 @@ button{
 	font-size:3vw;
 	width:20vw;
 	height:12vh;
-	background-color: DarkBlue;
+	background-color: #000770;
 	border: 4px solid #2D5BA4;
 }
 

@@ -151,7 +151,7 @@ function menu_tick(){
 
 
 
-	clear_screen("DarkBlue");
+	clear_screen(DEEP_OCEAN);
 
 	for(let p = 0; p < player.particles.length; p++){
 		if(player.particles[p].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2)){

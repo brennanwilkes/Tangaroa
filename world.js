@@ -73,8 +73,8 @@ class Map{
 					this.settings.x = x;
 					this.settings.y = y;
 					if(this.size === 1){
-						this.settings.size_x = 1024;
-						this.settings.size_y = 1024;
+						this.settings.size_x = (this.settings.type===0 ? 1024 : 2048);
+						this.settings.size_y = (this.settings.type===0 ? 1024 : 2048);
 					}
 
 					console.log("loading ["+x+", "+y+"] - "+Math.round(100*total/this.total_islands)+"%");
@@ -99,7 +99,7 @@ class Map{
 
 		ctx.fillStyle = "#654321";
 		ctx.fillRect(w-10,h-10,sqr*this.size+20,sqr*this.size+20);
-		ctx.fillStyle = "DarkBlue";
+		ctx.fillStyle = DEEP_OCEAN;
 		ctx.fillRect(w,h,sqr*this.size,sqr*this.size);
 		ctx.fillStyle = "#604321";
 		ctx.strokeStyle = "#453311";
