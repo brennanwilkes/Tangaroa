@@ -68,6 +68,10 @@ class Boid{
 		return Math.abs(this.get_ang()-this.get_ang(boi.position)) < VIEW_ANG;
 	}
 
+	within_player_sight(player){
+		return Math.abs(this.get_ang()-this.get_ang([player.x,player.y])) < VIEW_ANG/2 || boid_dist(this.position,[player.x,player.y]) < VIEW_DIST/2;
+	}
+
 	target_tick(target,target_vel){
 		this.turn(this.get_ang([target[0],target[1]]),TARGET_FORCE);
 		this.turn(this.get_ang([this.position[0]+ran_b(-1000,1000),this.position[1]+ran_b(-1000,1000)]),TARGET_RAN_FORCE);

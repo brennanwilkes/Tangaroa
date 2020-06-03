@@ -332,7 +332,7 @@ function game_tick(event){
 
 	for(let b = 0; b < Boid.totalBoids; b++){
 		if(Boid.boids[b].slowdown === 0){
-			Boid.boids[b].flee = (Boid.boids[b].flee || player.speed < 5);
+			Boid.boids[b].flee = (Boid.boids[b].flee || player.speed < 5 || !Boid.boids[b].within_player_sight(player) );
 			Boid.boids[b].player_tick(player);
 		}
 

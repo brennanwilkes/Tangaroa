@@ -24,6 +24,11 @@ class Map{
 	}
 
 	generate_map_data(){
+		if(this.size===1){
+			this.raw_data = [[1]];
+			return;
+		}
+
 		this.raw_data = gen_noise_map(this.size, this.size, MAP_SCALE, MAP_OCT, MAP_PERSIST, MAP_LAC, this.seed);
 		for(let x=0; x<this.size;x++){
 			for(let y=0; y<this.size;y++){
@@ -67,6 +72,10 @@ class Map{
 					this.settings.type = hash(this.settings.seed)%4 === 0 ? 1 : 0;
 					this.settings.x = x;
 					this.settings.y = y;
+					if(this.size === 1){
+						this.settings.size_x = 1024;
+						this.settings.size_y = 1024;
+					}
 
 					console.log("loading ["+x+", "+y+"] - "+Math.round(100*total/this.total_islands)+"%");
 					this.islands[x][y] = generate_random_island(this.settings);
