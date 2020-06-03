@@ -118,6 +118,8 @@ function draw_screen(){
 	ctx.drawImage(player.img, 0, 0);
 	ctx.restore();
 
+	map.draw_lighting(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
+
 }
 
 function menu_tick(){
@@ -190,6 +192,7 @@ function game_tick(event){
 
 		if(!map.is_transit){
 			delete map.canvas_img;
+			delete map.lighting_img;
 		}
 
 		//go left
