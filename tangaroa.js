@@ -137,7 +137,7 @@ function menu_tick(){
 		menu_target = [sx*MAX_X*-2/3,sy*MAX_Y*-2/3];
 
 		for(let n=0;n<num_new_boids;n++){
-			new Boid(sx*MAX_X*2/3 + ran_b(-100,100), sy*MAX_X*2/3 + ran_b(-100,100),sx*-1,sy*-1,0);
+			new Boid(sx*MAX_X*2/3 + ran_b(-100,100), sy*MAX_X*2/3 + ran_b(-100,100),sx*-1,sy*-1,0,true);
 		}
 		Boid.boids[0].img.src = "canoe.png";
 	}
@@ -332,7 +332,7 @@ function game_tick(event){
 
 	for(let b = 0; b < Boid.totalBoids; b++){
 		if(Boid.boids[b].slowdown === 0){
-			Boid.boids[b].flee = (Boid.boids[b].flee || player.speed < 4);
+			Boid.boids[b].flee = (Boid.boids[b].flee || player.speed < 5);
 			Boid.boids[b].player_tick(player);
 		}
 

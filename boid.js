@@ -1,10 +1,10 @@
 const ALN_FORCE = 0.0125;
 const COH_FORCE = 0.01;
-const SEP_FORCE = -0.02;
+const SEP_FORCE = -0.12;
 
-const PLAYER_ALN_FORCE = 0.05;
-const PLAYER_COH_FORCE = 0.1;
-const PLAYER_VEL_FORCE = 0.005;
+const PLAYER_ALN_FORCE = 0;//.05;
+const PLAYER_COH_FORCE = 0.25;
+const PLAYER_VEL_FORCE = 0.0045;
 
 const TARGET_RAN_FORCE = 0.2;
 const TARGET_FORCE = 0.05;
@@ -25,7 +25,7 @@ function bound_ang(a){
 
 class Boid{
 
-	constructor(x, y, xs, ys, slowdown){
+	constructor(x, y, xs, ys, slowdown, target=false){
 
 		this.position = [x, y];
 		this.velocity = [xs, ys];
@@ -37,6 +37,7 @@ class Boid{
 		this.img.src = "boid.png";
 
 		this.slowdown = slowdown;
+		this.target_md = target;
 
 		Boid.boids.push(this);
 		Boid.totalBoids++;
@@ -104,7 +105,7 @@ class Boid{
 
 					//separation
 					//console.log((1-(this.distance(Boid.boids[b]) / VIEW_DIST)),Math.pow((1-(this.distance(Boid.boids[b]) / VIEW_DIST)),0.5))
-					this.turn(this.get_ang(Boid.boids[b].position),SEP_FORCE*Math.pow((1-(this.distance(Boid.boids[b]) / VIEW_DIST)),0.1));
+					this.turn(this.get_ang(Boid.boids[b].position),(this.target_md ? 0.15 : 1)*SEP_FORCE*Math.pow((1-(this.distance(Boid.boids[b]) / VIEW_DIST)),0.1));
 
 					//cohesion
 					avg_pos[0] += Boid.boids[b].position[0];
@@ -124,7 +125,7 @@ class Boid{
 			//Cohesion
 			avg_pos[0] = avg_pos[0] / total_local_boids;
 			avg_pos[1] = avg_pos[1] / total_local_boids;
-			this.turn(this.get_ang(avg_pos),COH_FORCE);
+			this.turn(this.get_ang(avg_pos),(this.target_md ? 1.15 : 1)*COH_FORCE);
 
 		}
 	}
