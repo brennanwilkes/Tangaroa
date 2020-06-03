@@ -584,18 +584,6 @@ class IslandCopy{
 					if(claimed_pixels[hash_arr([xx,yy])] === undefined ){
 						claimed_pixels[hash_arr([xx,yy])] = 1;
 						ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
-					}
-					if(claimed_pixels[hash_arr([xx2,yy2])] === undefined ){
-						claimed_pixels[hash_arr([xx2,yy2])] = 1;
-						ctx_img.fillRect(xx2*ISLAND_PIXEL_SCALE,yy2*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
-					}
-					if(claimed_pixels[hash_arr([xx,yy2])] === undefined ){
-						claimed_pixels[hash_arr([xx,yy2])] = 1;
-						ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy2*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
-					}
-					if(claimed_pixels[hash_arr([xx2,yy])] === undefined ){
-						claimed_pixels[hash_arr([xx2,yy])] = 1;
-						ctx_img.fillRect(xx2*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
 					}*/
 				}
 				peak = nextpeak;

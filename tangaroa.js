@@ -21,6 +21,8 @@ var menu_target;
 var intervalID;
 var tickCount = 0;
 
+var lighting_overlay;
+
 
 function clear_screen(colour){
 	if(colour === undefined){
@@ -64,6 +66,12 @@ function setUp(){
 	player.space = false;
 
 	player.particles = new Array();
+
+
+	lighting_overlay = document.createElement("div");
+	lighting_overlay.id = "lighting_overlay";
+	document.body.prepend(lighting_overlay);
+
 
 	intervalID = setInterval(menu_tick,4);
 }
@@ -358,9 +366,12 @@ function game_tick(event){
 	player.x = Math.round(player.rx);
 	player.y = Math.round(player.ry);
 
-	if(tickCount%250 === 0 && !map.is_transit && !map.is_map_island){
-		LIGHTING_DISTANCE = 1 + (LIGHTING_DISTANCE += 10)%250;
-		map.bake_lighting();
+	if(tickCount%250 === 0 && !map.is_map_island){
+		LIGHTING_DISTANCE = 1 + (LIGHTING_DISTANCE += 10)%100;
+		document.getElementById("lighting_overlay").style.opacity = LIGHTING_DISTANCE/200;
+		if(!map.is_transit){
+			map.bake_lighting();
+		}
 	}
 
 	draw_screen();
