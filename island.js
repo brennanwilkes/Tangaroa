@@ -91,6 +91,16 @@ function rgb(r,g,b){
 	return "rgb("+r+", "+g+", "+b+")";
 }
 
+function hash_arr(arr){
+	let hash = 0x12345678;
+
+	while (arr.length > 0) {
+		hash ^= (hash << 16) | (hash << 19);
+		hash += arr.pop();
+		hash ^= (hash << 26) | (hash << 13);
+	}
+	return Math.abs(hash);
+}
 
 function hash(num){
 	let hash = 0x12345678;
@@ -113,13 +123,16 @@ function pixel_distance(peak,coord){
 }
 
 function colour_round(colour){
-	if(colour <0.1){
+	if(colour == TOWN_HEIGHT){
+		return 4;
+	}
+	else if(colour <0.1){
 		return 0;
 	}
 	else if(colour <0.3){
 		return 1;
 	}
-	else if(colour  < 0.35 || colour == TOWN_HEIGHT){
+	else if(colour  < 0.35){
 		return 2;
 	}
 	else if(colour  < 0.45){
@@ -157,7 +170,8 @@ const ISL_PERSIST = 2;
 const ISL_LAC = 0.7;
 
 const ISLAND_PIXEL_SCALE = 8;
-const LIGHTING_DISTANCE = 100;
+var LIGHTING_DISTANCE = 1;
+var LIGHTING_ANGLE = Math.PI/4;
 
 
 const TOWN_HEIGHT = 0.36;
@@ -525,33 +539,65 @@ class IslandCopy{
 
 		let ctx_img = this.lighting_img.getContext("2d");
 
+		//REFERENCE
+		//let claimed_pixels = new Object();
 
-
-		let peak, nextpeak, h, h1,xx,yy;
+		let peak, nextpeak, h, hn, xx,yy;
 
 		let maxsize = Math.max(this.size[0],this.size[1])-ISLAND_PIXEL_SCALE;
+
 
 		for(let y=maxsize*-1;y<maxsize;y+=ISLAND_PIXEL_SCALE){
 			peak = undefined;
 			nextpeak = undefined;
 			for(let x=0;x<maxsize;x+=ISLAND_PIXEL_SCALE){
 				xx = Math.floor(x/ISLAND_PIXEL_SCALE);
-				yy = xx+Math.floor(y/ISLAND_PIXEL_SCALE);
+				yy = Math.floor(y/ISLAND_PIXEL_SCALE) + xx;
+
+				//ANGLE MODE
+				//yy = Math.floor(y/ISLAND_PIXEL_SCALE)+Math.floor(Math.tan(LIGHTING_ANGLE)*xx);
+
+				//REFERENCE
+				//xx2 = Math.ceil(x/ISLAND_PIXEL_SCALE);
+				//yy2 = Math.ceil(y/ISLAND_PIXEL_SCALE)+Math.ceil(Math.tan(LIGHTING_ANGLE)*xx2);
+
 
 				if(xx >= this.raw_data.size || yy >= this.raw_data[xx].size || xx <= 0 || yy <= 0 ){
 					continue;
 				}
 
 				h = this.raw_data[xx][yy];
-				h1 = this.raw_data[xx+1][yy+1];
+				hn = this.raw_data[xx+1][yy+1];
 
-				if(colour_round(h) > colour_round(h1) && colour_round(h1) > 1){
+				//ANGLE MODE
+				//hn = this.raw_data[xx+1][yy+Math.floor(Math.tan(LIGHTING_ANGLE)*1)];
+
+				if(colour_round(h) > colour_round(hn) && colour_round(hn) > 2){
 					nextpeak = [xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h];
 				}
 
 				if( peak!=undefined && colour_round(peak[2]) > 3 && colour_round(peak[2]) > colour_round(h)){
 					ctx_img.fillStyle = "rgba(0, 0, 0, "+get_lighting(peak,[xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h])+")";
 					ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
+
+					//REFERENCE
+					/*
+					if(claimed_pixels[hash_arr([xx,yy])] === undefined ){
+						claimed_pixels[hash_arr([xx,yy])] = 1;
+						ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
+					}
+					if(claimed_pixels[hash_arr([xx2,yy2])] === undefined ){
+						claimed_pixels[hash_arr([xx2,yy2])] = 1;
+						ctx_img.fillRect(xx2*ISLAND_PIXEL_SCALE,yy2*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
+					}
+					if(claimed_pixels[hash_arr([xx,yy2])] === undefined ){
+						claimed_pixels[hash_arr([xx,yy2])] = 1;
+						ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy2*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
+					}
+					if(claimed_pixels[hash_arr([xx2,yy])] === undefined ){
+						claimed_pixels[hash_arr([xx2,yy])] = 1;
+						ctx_img.fillRect(xx2*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
+					}*/
 				}
 				peak = nextpeak;
 			}
@@ -734,6 +780,7 @@ class TransitIsland{
 	}
 
 	draw(ctx, offsetx, offsety){}
+	draw_lighting(ctx, offsetx, offsety){}
 	onbeach(x,y){
 		return false;
 	}
