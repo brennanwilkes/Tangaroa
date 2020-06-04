@@ -170,7 +170,7 @@ const ISL_PERSIST = 2;
 const ISL_LAC = 0.7;
 
 const ISLAND_PIXEL_SCALE = 4;
-var LIGHTING_DISTANCE = 1;
+var LIGHTING_DISTANCE = 15;
 
 
 const TOWN_HEIGHT = 0.36;
@@ -550,7 +550,7 @@ class IslandCopy{
 			//yy2 = Math.ceil(y/ISLAND_PIXEL_SCALE)+Math.ceil(Math.tan(LIGHTING_ANGLE)*xx2);
 
 
-			if(xx >= this.raw_data.size || yy >= this.raw_data[xx].size || xx <= 0 || yy <= 0 ){
+			if(xx+1 >= this.raw_data.size || yy+1 >= this.raw_data[xx].size || xx <= 0 || yy <= 0 ){
 				continue;
 			}
 
@@ -587,6 +587,7 @@ class IslandCopy{
 	}
 
 	bake_lighting(rebake = false){
+
 		let ctx_img, temp_canvas;
 		if(rebake){
 			temp_canvas = document.createElement('canvas');

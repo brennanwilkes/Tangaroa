@@ -105,26 +105,19 @@ function draw_screen(){
 		}
 	}
 
+	ctx.save();
+	ctx.translate(MAX_X/2,MAX_Y/2);
+	ctx.scale(0.05,0.05);
+	ctx.translate(player.img.width*0.025,player.img.height*0.025);
+	ctx.rotate(player.rot);
+	ctx.rotate(Math.PI*-0.5);
+	ctx.translate(player.img.width/-2,player.img.height/-2);
+	ctx.drawImage(player.img, 0, 0);
+	ctx.restore();
+
 	for(let b = 0; b < Boid.totalBoids; b++){
 		Boid.boids[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 	}
-
-	ctx.save();
-	ctx.translate(MAX_X/2,MAX_Y/2);
-
-	ctx.scale(0.05,0.05);
-
-	ctx.translate(player.img.width*0.025,player.img.height*0.025);
-
-
-	ctx.rotate(player.rot);
-	ctx.rotate(Math.PI*-0.5);
-
-	ctx.translate(player.img.width/-2,player.img.height/-2);
-
-
-	ctx.drawImage(player.img, 0, 0);
-	ctx.restore();
 
 	map.draw_lighting(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 
@@ -149,7 +142,7 @@ function menu_tick(){
 		for(let n=0;n<num_new_boids;n++){
 			new Boid(sx*MAX_X*2/3 + ran_b(-100,100), sy*MAX_X*2/3 + ran_b(-100,100),sx*-1,sy*-1,0,true);
 		}
-		Boid.boids[0].img.src = "canoe.png";
+		//Boid.boids[0].img.src = "canoe.png";
 	}
 
 	Boid.boids[tickCount%Boid.totalBoids].ai_tick();
@@ -365,6 +358,7 @@ function game_tick(event){
 	player.x = Math.round(player.rx);
 	player.y = Math.round(player.ry);
 
+	/*
 	if(tickCount%5000 === 0 && !map.is_map_island){
 		LIGHTING_DISTANCE = 1 + (LIGHTING_DISTANCE += 10)%100;
 		document.getElementById("lighting_overlay").style.opacity = LIGHTING_DISTANCE/200;
@@ -372,6 +366,7 @@ function game_tick(event){
 			map.bake_lighting(true);
 		}
 	}
+	*/
 
 	draw_screen();
 

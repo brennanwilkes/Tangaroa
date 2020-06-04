@@ -133,6 +133,30 @@ class Map{
 		if(this.canvas_img === undefined ){
 			this.gen_canvas_img(ctx);
 		}
+
 		ctx.drawImage(this.canvas_img, 0, 0);
+
+		let current = this.get(player.wx,player.wy);
+		if(current.is_transit){
+			return;
+		}
+
+
+
+		ctx.beginPath();
+
+		let sqr = Math.round(Math.min(ctx.canvas.width,ctx.canvas.height)*0.75 / this.size);
+		let w = Math.round(ctx.canvas.width/2-(sqr*this.size/2));
+		let h = Math.round(ctx.canvas.height/2-(sqr*this.size/2));
+
+		let x = Math.round(w+player.wx*sqr);
+		let y = Math.round(h+player.wy*sqr);
+		ctx.arc(x+player.x/current.size[0]*sqr, y+player.y/current.size[1]*sqr, 10, 0, 2 * Math.PI, false);
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "#FFC922";
+		if(player.x> 0 && player.y > 0 && player.x < current.size[0] && player.y < current.size[1]){
+			ctx.stroke();
+		}
+
 	}
 }
