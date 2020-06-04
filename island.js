@@ -584,6 +584,7 @@ class IslandCopy{
 		delete this.canvas_img;
 		delete this.lighting_img;
 		this.lighting_ready = false;
+		this.canvas_ready = false;
 	}
 
 	bake_lighting(rebake = false){
@@ -621,6 +622,13 @@ class IslandCopy{
 		},delay+10);
 	}
 
+	gen_ctx_colour(c,ctx_img){
+		ctx_img.fillStyle = this.colours[c];
+		for(let p=0;p<this.display_data[this.colours[c]].length;p++){
+			ctx_img.fillRect(this.display_data[this.colours[c]][p][0]*ISLAND_PIXEL_SCALE, this.display_data[this.colours[c]][p][1]*ISLAND_PIXEL_SCALE, this.display_data[this.colours[c]][p][3]*ISLAND_PIXEL_SCALE, this.display_data[this.colours[c]][p][2]*ISLAND_PIXEL_SCALE);
+		}
+	}
+
 	gen_ctx_img(){
 		this.canvas_img = document.createElement('canvas');
 		if(this.is_map_island){
@@ -633,13 +641,16 @@ class IslandCopy{
 		}
 		let ctx_img = this.canvas_img.getContext("2d");
 
+		let temp_this = this;
+		let delay = 1;
 		for(let c=1;c<this.colours.length;c++){
-			ctx_img.fillStyle = this.colours[c];
-
-			for(let p=0;p<this.display_data[this.colours[c]].length;p++){
-				ctx_img.fillRect(this.display_data[this.colours[c]][p][0]*ISLAND_PIXEL_SCALE, this.display_data[this.colours[c]][p][1]*ISLAND_PIXEL_SCALE, this.display_data[this.colours[c]][p][3]*ISLAND_PIXEL_SCALE, this.display_data[this.colours[c]][p][2]*ISLAND_PIXEL_SCALE);
-			}
+			setTimeout(function(){
+				temp_this.gen_ctx_colour(c,ctx_img);
+			},delay+=25);
 		}
+		setTimeout(function(){
+			temp_this.canvas_ready = true;
+		},delay+25);
 	}
 
 }
