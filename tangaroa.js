@@ -131,10 +131,10 @@ function menu_tick(){
 
 	if(tickCount%25 === 0){
 		gameTime++;
-		if(gameTime === 50){
+		if(gameTime === 100){
 			gameTime *= -1;
 		}
-		document.getElementById("lighting_overlay").style.opacity = Math.max(Math.abs(gameTime)-10,0)/80;
+		document.getElementById("lighting_overlay").style.opacity = Math.max(Math.abs(gameTime)-45,0)/100;
 	}
 
 	//clear and respawn boids
@@ -368,13 +368,13 @@ function game_tick(event){
 	player.y = Math.round(player.ry);
 
 
-	if(tickCount%500 === 0){
+	if(tickCount%750 === 0){
 		gameTime++;
-		if(gameTime === 50){
+		if(gameTime === 100){
 			gameTime *= -1;
 		}
-		LIGHTING_DISTANCE = 10 + Math.max(Math.abs(gameTime)-10,0);
-		document.getElementById("lighting_overlay").style.opacity = Math.max(Math.abs(gameTime)-10,0)/80;
+		LIGHTING_DISTANCE = 10 + Math.max(Math.abs(gameTime)-45,0)*1.5;
+		document.getElementById("lighting_overlay").style.opacity = Math.max(Math.abs(gameTime)-45,0)/140;
 		if(!map.is_transit){
 			map.bake_lighting(true);
 		}

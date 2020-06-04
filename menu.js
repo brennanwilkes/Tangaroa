@@ -7,7 +7,7 @@ function QuickPlay(event){
 }
 
 function NewGame(event){
-	world = new Map(false,3);
+	world = new Map(false,1);
 	start_game();
 }
 
@@ -22,6 +22,10 @@ function start_game(){
 	if(Boid.totalBoids > 0){
 		Boid.boids[0].kill(true);
 	}
+
+	gameTime = 0;
+	document.getElementById("lighting_overlay").style.opacity = 0;
+
 
 
 	map = world.get(player.wx,player.wy);
