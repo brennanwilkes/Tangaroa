@@ -349,7 +349,9 @@ class IslandCopy{
 		if(this.canvas_img === undefined){
 			this.gen_ctx_img();
 		}
-		ctx.drawImage(this.canvas_img, offsetx, offsety);
+		if(this.canvas_ready){
+			ctx.drawImage(this.canvas_img, offsetx, offsety);
+		}
 	}
 
 	draw_lighting(ctx, offsetx, offsety){
@@ -357,7 +359,9 @@ class IslandCopy{
 			if(this.lighting_img === undefined){
 				this.bake_lighting();
 			}
-			ctx.drawImage(this.lighting_img, offsetx, offsety);
+			if(this.lighting_ready){
+				ctx.drawImage(this.lighting_img, offsetx, offsety);
+			}
 		}
 	}
 
@@ -530,65 +534,91 @@ class IslandCopy{
 		}
 	}
 
-	bake_lighting(){
-		this.lighting_img = document.createElement('canvas');
+	bake_strip(maxsize, y, ctx_img){
+		let peak, nextpeak, h, hn, xx,yy;
 
-		this.lighting_img.width = this.size[0];
-		this.lighting_img.height = this.size[1];
+		peak = undefined;
+		nextpeak = undefined;
+		for(let x=0;x<maxsize;x+=ISLAND_PIXEL_SCALE){
+			xx = Math.floor(x/ISLAND_PIXEL_SCALE);
+			yy = Math.floor(y/ISLAND_PIXEL_SCALE) + xx;
 
-		let ctx_img = this.lighting_img.getContext("2d");
+			//ANGLE MODE
+			//yy = Math.floor(y/ISLAND_PIXEL_SCALE)+Math.floor(Math.tan(LIGHTING_ANGLE)*xx);
+
+			//REFERENCE
+			//xx2 = Math.ceil(x/ISLAND_PIXEL_SCALE);
+			//yy2 = Math.ceil(y/ISLAND_PIXEL_SCALE)+Math.ceil(Math.tan(LIGHTING_ANGLE)*xx2);
+
+
+			if(xx >= this.raw_data.size || yy >= this.raw_data[xx].size || xx <= 0 || yy <= 0 ){
+				continue;
+			}
+
+			h = this.raw_data[xx][yy];
+			hn = this.raw_data[xx+1][yy+1];
+
+			//ANGLE MODE
+			//hn = this.raw_data[xx+1][yy+Math.floor(Math.tan(LIGHTING_ANGLE)*1)];
+
+			if(colour_round(h) > colour_round(hn) && colour_round(hn) > 2){
+				nextpeak = [xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h];
+			}
+
+			if( peak!=undefined && colour_round(peak[2]) > 2 && colour_round(peak[2]) > colour_round(h)){
+				ctx_img.fillStyle = "rgba(0, 0, 0, "+get_lighting(peak,[xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h])+")";
+				ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
+
+				//REFERENCE
+				/*
+				if(claimed_pixels[hash_arr([xx,yy])] === undefined ){
+					claimed_pixels[hash_arr([xx,yy])] = 1;
+					ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
+				}*/
+			}
+			peak = nextpeak;
+		}
+	}
+
+	unload(){
+		delete this.canvas_img;
+		delete this.lighting_img;
+		this.lighting_ready = false;
+	}
+
+	bake_lighting(rebake = false){
+		let ctx_img, temp_canvas;
+		if(rebake){
+			temp_canvas = document.createElement('canvas');
+			temp_canvas.width = this.size[0];
+			temp_canvas.height = this.size[1];
+			ctx_img = temp_canvas.getContext("2d");
+		}
+		else{
+			this.lighting_img = document.createElement('canvas');
+			this.lighting_img.width = this.size[0];
+			this.lighting_img.height = this.size[1];
+			ctx_img = this.lighting_img.getContext("2d");
+		}
 
 		//REFERENCE
 		//let claimed_pixels = new Object();
 
-		let peak, nextpeak, h, hn, xx,yy;
-
 		let maxsize = Math.max(this.size[0],this.size[1])-ISLAND_PIXEL_SCALE;
 
-
+		let temp_this = this;
+		let delay = 1;
 		for(let y=maxsize*-1;y<maxsize;y+=ISLAND_PIXEL_SCALE){
-			peak = undefined;
-			nextpeak = undefined;
-			for(let x=0;x<maxsize;x+=ISLAND_PIXEL_SCALE){
-				xx = Math.floor(x/ISLAND_PIXEL_SCALE);
-				yy = Math.floor(y/ISLAND_PIXEL_SCALE) + xx;
-
-				//ANGLE MODE
-				//yy = Math.floor(y/ISLAND_PIXEL_SCALE)+Math.floor(Math.tan(LIGHTING_ANGLE)*xx);
-
-				//REFERENCE
-				//xx2 = Math.ceil(x/ISLAND_PIXEL_SCALE);
-				//yy2 = Math.ceil(y/ISLAND_PIXEL_SCALE)+Math.ceil(Math.tan(LIGHTING_ANGLE)*xx2);
-
-
-				if(xx >= this.raw_data.size || yy >= this.raw_data[xx].size || xx <= 0 || yy <= 0 ){
-					continue;
-				}
-
-				h = this.raw_data[xx][yy];
-				hn = this.raw_data[xx+1][yy+1];
-
-				//ANGLE MODE
-				//hn = this.raw_data[xx+1][yy+Math.floor(Math.tan(LIGHTING_ANGLE)*1)];
-
-				if(colour_round(h) > colour_round(hn) && colour_round(hn) > 2){
-					nextpeak = [xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h];
-				}
-
-				if( peak!=undefined && colour_round(peak[2]) > 2 && colour_round(peak[2]) > colour_round(h)){
-					ctx_img.fillStyle = "rgba(0, 0, 0, "+get_lighting(peak,[xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h])+")";
-					ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
-
-					//REFERENCE
-					/*
-					if(claimed_pixels[hash_arr([xx,yy])] === undefined ){
-						claimed_pixels[hash_arr([xx,yy])] = 1;
-						ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
-					}*/
-				}
-				peak = nextpeak;
-			}
+			setTimeout(function(){
+				temp_this.bake_strip(maxsize,y, ctx_img);
+			},delay++);
 		}
+		setTimeout(function(){
+			if(rebake){
+				temp_this.lighting_img = temp_canvas;
+			}
+			temp_this.lighting_ready = true;
+		},delay+10);
 	}
 
 	gen_ctx_img(){
@@ -621,7 +651,10 @@ class Island extends IslandCopy{
 		super();
 
 		this.canvas_img;
+		this.canvas_ready = true;
+
 		this.lighting_img;
+		this.lighting_ready = false;
 
 		this.replicable_seed = seed;
 		this.seed = hash(seed);

@@ -199,8 +199,7 @@ function game_tick(event){
 	if((player.rx < Math.max(MAX_X,map.size[0])*-1) || (player.rx > Math.max(MAX_X,map.size[0])*2) || (player.ry < Math.max(MAX_Y,map.size[1])*-1) || (player.ry > Math.max(MAX_Y,map.size[1])*2)){
 
 		if(!map.is_transit){
-			delete map.canvas_img;
-			delete map.lighting_img;
+			map.unload();
 		}
 
 		//go left
@@ -366,11 +365,11 @@ function game_tick(event){
 	player.x = Math.round(player.rx);
 	player.y = Math.round(player.ry);
 
-	if(tickCount%250 === 0 && !map.is_map_island){
+	if(tickCount%500 === 0 && !map.is_map_island){
 		LIGHTING_DISTANCE = 1 + (LIGHTING_DISTANCE += 10)%100;
 		document.getElementById("lighting_overlay").style.opacity = LIGHTING_DISTANCE/200;
 		if(!map.is_transit){
-			map.bake_lighting();
+			map.bake_lighting(true);
 		}
 	}
 
