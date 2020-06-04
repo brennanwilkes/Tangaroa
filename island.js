@@ -206,7 +206,6 @@ function generate_random_island(settings=new IslandSettings()){
 
 class IslandCopy{
 	constructor(isl,size){
-		//this.colours = ["DarkBlue","#2D5BA4","#297900","#145900","#093900","#D0AB76","#654321","slategrey","#222222","darkred","orange"];
 		this.colours = [DEEP_OCEAN, SHALLOW_OCEAN, LAND_ONE, LAND_TWO, LAND_THREE, BEACH, VILLAGE, ROCK_ONE, ROCK_TWO, LAVA_ONE, LAVA_TWO];
 		this.raw_data;
 		this.display_data;
@@ -349,7 +348,7 @@ class IslandCopy{
 		if(this.canvas_img === undefined){
 			this.gen_ctx_img();
 		}
-		if(this.canvas_ready){
+		if(this.canvas_ready || this.is_map_island){
 			ctx.drawImage(this.canvas_img, offsetx, offsety);
 		}
 	}
@@ -644,15 +643,22 @@ class IslandCopy{
 		let temp_this = this;
 		let delay = 1;
 		for(let c=1;c<this.colours.length;c++){
+			if(this.is_map_island){
+				this.gen_ctx_colour(c,ctx_img);
+				continue;
+			}
 			setTimeout(function(){
 				temp_this.gen_ctx_colour(c,ctx_img);
 			},delay+=25);
+		}
+		if(this.is_map_island){
+			this.canvas_ready = true;
+			return;
 		}
 		setTimeout(function(){
 			temp_this.canvas_ready = true;
 		},delay+25);
 	}
-
 }
 
 

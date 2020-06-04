@@ -365,7 +365,7 @@ function game_tick(event){
 	player.x = Math.round(player.rx);
 	player.y = Math.round(player.ry);
 
-	if(tickCount%500 === 0 && !map.is_map_island){
+	if(tickCount%5000 === 0 && !map.is_map_island){
 		LIGHTING_DISTANCE = 1 + (LIGHTING_DISTANCE += 10)%100;
 		document.getElementById("lighting_overlay").style.opacity = LIGHTING_DISTANCE/200;
 		if(!map.is_transit){

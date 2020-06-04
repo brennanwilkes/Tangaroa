@@ -19,6 +19,8 @@ class Map{
 		this.total_islands = 0;
 		this.transit_island = new TransitIsland();
 
+		this.canvas_img;
+
 		this.generate_map_data();
 		this.generate_islands();
 	}
@@ -92,18 +94,24 @@ class Map{
 		return (this.raw_data[x][y] === 1 ? this.islands[x][y] : this.transit_island);
 	}
 
-	draw(ctx){
+	gen_canvas_img(ctx){
+		this.canvas_img = document.createElement('canvas');
+		this.canvas_img.width = ctx.canvas.width;	//screen maxes
+		this.canvas_img.height = ctx.canvas.height;	//screen maxes
+
+		let ctx_img = this.canvas_img.getContext("2d");
+
 		let sqr = Math.round(Math.min(ctx.canvas.width,ctx.canvas.height)*0.75 / this.size);
 		let w = Math.round(ctx.canvas.width/2-(sqr*this.size/2));
 		let h = Math.round(ctx.canvas.height/2-(sqr*this.size/2));
 
-		ctx.fillStyle = "#654321";
-		ctx.fillRect(w-10,h-10,sqr*this.size+20,sqr*this.size+20);
-		ctx.fillStyle = DEEP_OCEAN;
-		ctx.fillRect(w,h,sqr*this.size,sqr*this.size);
-		ctx.fillStyle = "#604321";
-		ctx.strokeStyle = "#453311";
-		ctx.lineWidth = 2;
+		ctx_img.fillStyle = "#654321";
+		ctx_img.fillRect(w-10,h-10,sqr*this.size+20,sqr*this.size+20);
+		ctx_img.fillStyle = DEEP_OCEAN;
+		ctx_img.fillRect(w,h,sqr*this.size,sqr*this.size);
+		ctx_img.fillStyle = "#604321";
+		ctx_img.strokeStyle = "#453311";
+		ctx_img.lineWidth = 2;
 
 		let b_x, b_y;
 
@@ -115,9 +123,16 @@ class Map{
 					b_x = Math.round(w+x*sqr);
 					b_y = Math.round(h+y*sqr);
 					tmp_isl = new IslandCopy(this.get(x,y),sqr);
-					tmp_isl.draw(ctx,b_x,b_y);
+					tmp_isl.draw(ctx_img,b_x,b_y);
 				}
 			}
 		}
+	}
+
+	draw(ctx){
+		if(this.canvas_img === undefined ){
+			this.gen_canvas_img(ctx);
+		}
+		ctx.drawImage(this.canvas_img, 0, 0);
 	}
 }
