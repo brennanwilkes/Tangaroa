@@ -151,8 +151,8 @@ class Map{
 
 		let x = Math.round(w+player.wx*sqr);
 		let y = Math.round(h+player.wy*sqr);
-		ctx.arc(x+player.x/current.size[0]*sqr, y+player.y/current.size[1]*sqr, 10, 0, 2 * Math.PI, false);
-		ctx.lineWidth = 3;
+		ctx.arc(x+player.x/current.size[0]*sqr, y+player.y/current.size[1]*sqr, 5, 0, 2 * Math.PI, false);
+		ctx.lineWidth = 2;
 		ctx.strokeStyle = "#FFC922";
 		if(player.x> 0 && player.y > 0 && player.x < current.size[0] && player.y < current.size[1]){
 			ctx.stroke();

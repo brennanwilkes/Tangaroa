@@ -182,7 +182,7 @@ let SMALL_SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408];
 
 let SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920, 2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072];
 
-let CLUSTER_SIZES = [2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072, 3200, 3328, 3456, 3584, 3712, 3840, 3968, 4096, 4224, 4352, 4480, 4608, 4736, 4864, 4992];
+let CLUSTER_SIZES = [2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072];//, 3200, 3328, 3456, 3584, 3712, 3840, 3968, 4096, 4224, 4352, 4480, 4608, 4736, 4864, 4992];
 
 
 class IslandSettings{
@@ -550,7 +550,7 @@ class IslandCopy{
 			//yy2 = Math.ceil(y/ISLAND_PIXEL_SCALE)+Math.ceil(Math.tan(LIGHTING_ANGLE)*xx2);
 
 
-			if(xx+1 >= this.raw_data.size || yy+1 >= this.raw_data[xx].size || xx <= 0 || yy <= 0 ){
+			if(xx+1 >= this.raw_data.size || xx <= 0 || this.raw_data===undefined || this.raw_data[xx+1] ===undefined || yy+1 >= this.raw_data[xx+1].size || yy <= 0 ){
 				continue;
 			}
 
@@ -612,14 +612,14 @@ class IslandCopy{
 		for(let y=maxsize*-1;y<maxsize;y+=ISLAND_PIXEL_SCALE){
 			setTimeout(function(){
 				temp_this.bake_strip(maxsize,y, ctx_img);
-			},delay++);
+			},delay+=5);
 		}
 		setTimeout(function(){
 			if(rebake){
 				temp_this.lighting_img = temp_canvas;
 			}
 			temp_this.lighting_ready = true;
-		},delay+10);
+		},delay+5);
 	}
 
 	gen_ctx_colour(c,ctx_img){

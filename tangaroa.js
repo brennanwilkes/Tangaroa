@@ -20,6 +20,7 @@ var player;
 var menu_target;
 var intervalID;
 var tickCount = 0;
+var gameTime = 0;
 
 var lighting_overlay;
 
@@ -126,6 +127,14 @@ function draw_screen(){
 function menu_tick(){
 	if(tickCount%10===0){
 		player.particles.push(new Particle(ran_b(MAX_X/-2,MAX_X/2),ran_b(MAX_Y/-2,MAX_Y/2), 0, 0, false, 400 , 4));
+	}
+
+	if(tickCount%25 === 0){
+		gameTime++;
+		if(gameTime === 50){
+			gameTime *= -1;
+		}
+		document.getElementById("lighting_overlay").style.opacity = Math.max(Math.abs(gameTime)-10,0)/80;
 	}
 
 	//clear and respawn boids
@@ -358,15 +367,19 @@ function game_tick(event){
 	player.x = Math.round(player.rx);
 	player.y = Math.round(player.ry);
 
-	/*
-	if(tickCount%5000 === 0 && !map.is_map_island){
-		LIGHTING_DISTANCE = 1 + (LIGHTING_DISTANCE += 10)%100;
-		document.getElementById("lighting_overlay").style.opacity = LIGHTING_DISTANCE/200;
+
+	if(tickCount%500 === 0){
+		gameTime++;
+		if(gameTime === 50){
+			gameTime *= -1;
+		}
+		LIGHTING_DISTANCE = 10 + Math.max(Math.abs(gameTime)-10,0);
+		document.getElementById("lighting_overlay").style.opacity = Math.max(Math.abs(gameTime)-10,0)/80;
 		if(!map.is_transit){
 			map.bake_lighting(true);
 		}
 	}
-	*/
+
 
 	draw_screen();
 
