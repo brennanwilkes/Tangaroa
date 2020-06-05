@@ -137,7 +137,7 @@ function menu_tick(){
 
 	if(tickCount%25 === 0){
 		gameTime++;
-		if(gameTime === 100){
+		if(gameTime >= 100){
 			gameTime *= -1;
 		}
 		document.getElementById("lighting_overlay").style.opacity = Math.max(Math.abs(gameTime)-45,0)/100;
@@ -396,7 +396,7 @@ function game_tick(event){
 
 	if(tickCount%750 === 0){
 		gameTime++;
-		if(gameTime === 100){
+		if(gameTime >= 100){
 			gameTime *= -1;
 		}
 		LIGHTING_DISTANCE = 10 + Math.max(Math.abs(gameTime)-45,0)*1.5;
