@@ -34,7 +34,7 @@ class Boid{
 		this.flee = false;
 
 		this.img = new Image();
-		this.img.src = "albatross.png";
+		this.img.src = "boid.png";
 
 		this.slowdown = slowdown;
 		this.target_md = target;

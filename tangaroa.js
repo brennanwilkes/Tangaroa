@@ -119,7 +119,7 @@ function draw_screen(){
 	ctx.rotate(player.rot);
 	ctx.rotate(Math.PI*-0.5);
 	ctx.translate(player.img.width/player.totalframes/-2,player.img.height/-2);
-	ctx.drawImage(player.img, player.img.width/player.totalframes * player.frame, 0, player.img.width/player.totalframes, player.img.height, -2, 0, player.img.width/9, player.img.height); //why the -2? I have no idea
+	ctx.drawImage(player.img, player.img.width/player.totalframes * player.frame, 0, player.img.width/player.totalframes, player.img.height, -2, 0, player.img.width/player.totalframes, player.img.height); //why the -2? I have no idea
 	ctx.restore();
 
 	for(let b = 0; b < Boid.totalBoids; b++){
@@ -155,7 +155,7 @@ function menu_tick(){
 		menu_target = [sx*MAX_X*-2/3,sy*MAX_Y*-2/3];
 
 		for(let n=0;n<num_new_boids;n++){
-			new Boid(sx*MAX_X*2/3 + ran_b(-100,100), sy*MAX_X*2/3 + ran_b(-100,100),sx*-1,sy*-1,0,true);
+			new Albatross(sx*MAX_X*2/3 + ran_b(-100,100), sy*MAX_X*2/3 + ran_b(-100,100),sx*-1,sy*-1,0,true);
 		}
 		//Boid.boids[0].img.src = "canoe.png";
 	}
@@ -163,7 +163,7 @@ function menu_tick(){
 	Boid.boids[tickCount%Boid.totalBoids].ai_tick();
 	for(let b = 0; b < Boid.totalBoids; b++){
 		Boid.boids[b].target_tick(menu_target);
-		Boid.boids[b].tick();
+		Boid.boids[b].tick(tickCount);
 	}
 
 
@@ -347,7 +347,7 @@ function game_tick(event){
 	if(player.speed > 4 && Boid.totalBoids < 5 && map.is_transit) {
 		let num_new_boids = ran_b(5,20);
 		for(let n=0;n<num_new_boids;n++){
-			new Boid(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-100,100), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-100,100), Math.cos(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-1,1), Math.sin(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-1,1),360);
+			new Albatross(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-100,100), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-100,100), Math.cos(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-1,1), Math.sin(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-1,1),360);
 		}
 	}
 
@@ -364,7 +364,7 @@ function game_tick(event){
 			Boid.boids[b].player_tick(player);
 		}
 
-		Boid.boids[b].tick();
+		Boid.boids[b].tick(tickCount);
 
 
 		if(player.speed <= 1){
