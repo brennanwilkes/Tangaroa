@@ -53,8 +53,12 @@ function setUp(){
 	player.speed = 0;
 	player.push = 0;
 
+	player.anim = 1;
+	player.frame = 0;
+	player.totalframes = 9;
+
 	player.img = new Image();
-	player.img.src = "canoe.png";
+	player.img.src = "canoe-sprite-Sheet.png";
 
 
 	player.onbeach = false;
@@ -84,6 +88,9 @@ function key_down(event){
 	else if(event.code==="Space"){
 		player.space = true;
 	}
+	else if(event.code === "Period"){
+		gameTime += 10;
+	}
 }
 function key_up(event){
 	if(event.key.substring(0,5) === "Arrow"){
@@ -108,12 +115,11 @@ function draw_screen(){
 
 	ctx.save();
 	ctx.translate(MAX_X/2,MAX_Y/2);
-	ctx.scale(0.05,0.05);
-	ctx.translate(player.img.width*0.025,player.img.height*0.025);
+	//ctx.translate(player.img.width*0.025,player.img.height*0.025);
 	ctx.rotate(player.rot);
 	ctx.rotate(Math.PI*-0.5);
-	ctx.translate(player.img.width/-2,player.img.height/-2);
-	ctx.drawImage(player.img, 0, 0);
+	ctx.translate(player.img.width/player.totalframes/-2,player.img.height/-2);
+	ctx.drawImage(player.img, player.img.width/player.totalframes * player.frame, 0, player.img.width/player.totalframes, player.img.height, -2, 0, player.img.width/9, player.img.height); //why the -2? I have no idea
 	ctx.restore();
 
 	for(let b = 0; b < Boid.totalBoids; b++){
@@ -286,6 +292,12 @@ function game_tick(event){
 			for(let i=0.05;i<1;i+=0.25){
 				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, true, (30 + 5*(1-i)*player.speed*12),Math.round(6*(1-i)/1) ));
 				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, false, (30 + 5*(1-i)*player.speed*12) ,Math.round(6*(1-i)/1) ));
+
+
+				//constructor(x, y, speed, rot, mirror, life = 60, size=4){
+
+				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, true, (30 + 5*(1-i)*player.speed*2),Math.round(3*(1-i)/1),-10.5 ));
+				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, false, (30 + 5*(1-i)*player.speed*2) ,Math.round(3*(1-i)/1),-10.5 ));
 			}
 		}
 	}
@@ -367,6 +379,20 @@ function game_tick(event){
 	player.x = Math.round(player.rx);
 	player.y = Math.round(player.ry);
 
+	if(player.up){
+		player.anim = 1;
+	}
+	else{
+		player.anim = 0;
+	}
+
+	if(tickCount % (35-Math.floor(player.speed)) === 0 && (player.anim !== 0 || player.frame !== 0)){
+		player.frame = (player.frame+1)%player.totalframes;
+		if(player.frame === 0 && player.anim !== 0){
+			player.frame++;
+		}
+	}
+
 
 	if(tickCount%750 === 0){
 		gameTime++;
@@ -374,7 +400,7 @@ function game_tick(event){
 			gameTime *= -1;
 		}
 		LIGHTING_DISTANCE = 10 + Math.max(Math.abs(gameTime)-45,0)*1.5;
-		document.getElementById("lighting_overlay").style.opacity = Math.max(Math.abs(gameTime)-45,0)/140;
+		document.getElementById("lighting_overlay").style.opacity = Math.max(Math.abs(gameTime)-45,0)/120;
 		if(!map.is_transit){
 			map.bake_lighting(true);
 		}
