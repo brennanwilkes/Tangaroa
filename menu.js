@@ -23,7 +23,7 @@ function start_game(){
 		Boid.boids[0].kill(true);
 	}
 
-	gameTime = 0;
+	gameTime = 50;
 	document.getElementById("lighting_overlay").style.opacity = 0;
 
 
