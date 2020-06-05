@@ -287,17 +287,21 @@ function game_tick(event){
 	else{
 		player.speed = Math.max(0,player.speed-0.025);
 	}
-	if(player.speed > 1 && tickCount%18==0){
+	if(player.speed > 0.35 && tickCount%18==0){
 		if(!player.onbeach && !player.onground){
 			for(let i=0.05;i<1;i+=0.25){
-				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, true, (30 + 5*(1-i)*player.speed*12),Math.round(6*(1-i)/1) ));
-				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, false, (30 + 5*(1-i)*player.speed*12) ,Math.round(6*(1-i)/1) ));
+
+				//main boat particles
+				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, true, (30 + 5*(1-i)*player.speed*12), Math.round(6*(1-i)/1) ));
+				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, false, (30 + 5*(1-i)*player.speed*12), Math.round(6*(1-i)/1) ));
 
 
 				//constructor(x, y, speed, rot, mirror, life = 60, size=4){
 
-				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, true, (30 + 5*(1-i)*player.speed*2),Math.round(3*(1-i)/1),-10.5 ));
-				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, false, (30 + 5*(1-i)*player.speed*2) ,Math.round(3*(1-i)/1),-10.5 ));
+
+				//side boat particles
+				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, true, (30 + 5*(1-i)*player.speed*2), Math.round(3*(1-i)/1), -10.5 ));
+				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, false, (30 + 5*(1-i)*player.speed*2), Math.round(3*(1-i)/1), -10.5 ));
 			}
 		}
 	}
@@ -343,7 +347,7 @@ function game_tick(event){
 	if(player.speed > 4 && Boid.totalBoids < 5 && map.is_transit) {
 		let num_new_boids = ran_b(5,20);
 		for(let n=0;n<num_new_boids;n++){
-			new Boid(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-100,100), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-100,100), Math.cos(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-2,2), Math.sin(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-2,2),360);
+			new Boid(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-100,100), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-100,100), Math.cos(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-1,1), Math.sin(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-1,1),360);
 		}
 	}
 

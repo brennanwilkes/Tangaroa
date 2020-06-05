@@ -3,8 +3,8 @@ const COH_FORCE = 0.01;
 const SEP_FORCE = -0.12;
 
 const PLAYER_ALN_FORCE = 0;//.05;
-const PLAYER_COH_FORCE = 0.25;
-const PLAYER_VEL_FORCE = 0.0045;
+const PLAYER_COH_FORCE = 0.0535;
+const PLAYER_VEL_FORCE = 0.0035;
 
 const TARGET_RAN_FORCE = 0.2;
 const TARGET_FORCE = 0.05;
@@ -34,7 +34,7 @@ class Boid{
 		this.flee = false;
 
 		this.img = new Image();
-		this.img.src = "boid.png";
+		this.img.src = "albatross.png";
 
 		this.slowdown = slowdown;
 		this.target_md = target;
@@ -69,7 +69,7 @@ class Boid{
 	}
 
 	within_player_sight(player){
-		return Math.abs(this.get_ang()-this.get_ang([player.x,player.y])) < VIEW_ANG/2 || boid_dist(this.position,[player.x,player.y]) < VIEW_DIST/2;
+		return Math.abs(this.get_ang()-this.get_ang([player.x,player.y])) < VIEW_ANG/2 || boid_dist(this.position,[player.x,player.y]) < VIEW_DIST;
 	}
 
 	target_tick(target,target_vel){
@@ -84,9 +84,11 @@ class Boid{
 			this.turn(player.rot+(this.get_ang() > player.rot ? Math.PI/2 : Math.PI/-2),2*PLAYER_ALN_FORCE);
 		}
 		else{
-			this.turn(this.get_ang([player.x,player.y]),PLAYER_COH_FORCE);
+			this.turn(this.get_ang([player.x + (player.xs*1), player.y + (player.ys*1)]),PLAYER_COH_FORCE);
 			this.turn(player.rot,PLAYER_ALN_FORCE);
-			this.match_vel([player.xs,player.ys],PLAYER_VEL_FORCE);
+			if(VIEW_DIST > boid_dist(this.position,[player.x,player.y])){
+				this.match_vel([player.xs*1.25,player.ys*1.25],PLAYER_VEL_FORCE);
+			};
 		}
 	}
 
@@ -137,11 +139,7 @@ class Boid{
 
 	tick(){
 		if(this.slowdown > 0) {
-			if(this.slowdown < 5){
-				this.velocity[0] *= 0.995;
-				this.velocity[1] *= 0.995;
-			}
-			this.slowdown--;
+			this.slowdown = 0;
 		}
 		else if(this.slowdown === -1 ){
 			this.velocity[0] *= 1.001;
@@ -157,9 +155,8 @@ class Boid{
 		ctx.save();
 		ctx.translate(offsetx+this.position[0], offsety+this.position[1]);
 
-		ctx.scale(0.05,0.05);
 		ctx.translate(this.img.width*0.025,this.img.height*0.025);
-		ctx.rotate(this.get_ang()-Math.PI/2);
+		ctx.rotate(this.get_ang()-Math.PI*3/2);
 		ctx.translate(this.img.width/-2,this.img.height/-2);
 
 		ctx.drawImage(this.img, 0, 0);
