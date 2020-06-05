@@ -151,18 +151,7 @@ class Boid{
 
 	}
 
-	draw(ctx,offsetx,offsety){
-		ctx.save();
-		ctx.translate(offsetx+this.position[0], offsety+this.position[1]);
-
-		ctx.translate(this.img.width*0.025,this.img.height*0.025);
-		ctx.rotate(this.get_ang()-Math.PI*3/2);
-		ctx.translate(this.img.width/-2,this.img.height/-2);
-
-		ctx.drawImage(this.img, 0, 0);
-
-		ctx.restore();
-	}
+	draw(ctx,offsetx,offsety){} //overload me
 
 	kill(all=false){
 		if(all){

@@ -4,7 +4,8 @@ class Albatross extends Boid{
 
 		this.img.src = "albatross-sprite-sheet.png"
 		this.totalframes = 10;
-		this.frame = 0;
+		this.frame = ran_b(0,this.totalframes-1);
+		this.animspeed = ran_b(12,20);
 	}
 
 	draw(ctx,offsetx,offsety){
@@ -23,7 +24,7 @@ class Albatross extends Boid{
 
 	tick(tickCount){
 		super.tick();
-		if(tickCount % 15 === 0){
+		if(tickCount % this.animspeed === 0){
 			this.frame = (this.frame+1)%this.totalframes;
 		}
 	}
