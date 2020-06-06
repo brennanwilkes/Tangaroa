@@ -2,7 +2,13 @@ class Albatross extends Boid{
 	constructor(x, y, xs, ys, slowdown, target=false){
 		super(x,y,xs,ys,slowdown,target);
 
-		this.img.src = "assets/albatross/albatross-sprite-sheet.png"
+		if(Math.random() < 0.9){
+			this.img.src = "assets/albatross/albatross-sprite-sheet.png"
+		}
+		else{
+			this.img.src = "assets/albatross/albatross-grey-sprite-sheet.png"
+		}
+
 		this.totalframes = 10;
 		this.frame = ran_b(0,this.totalframes-1);
 		this.animspeed = ran_b(12,20);

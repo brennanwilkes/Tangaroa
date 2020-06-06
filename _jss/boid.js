@@ -1,10 +1,10 @@
-const ALN_FORCE = 0.0125;
-const COH_FORCE = 0.01;
-const SEP_FORCE = -0.12;
+const ALN_FORCE = 0.02;
+const COH_FORCE = 0.06;
+const SEP_FORCE = -0.075;
 
 const PLAYER_ALN_FORCE = 0;//.05;
-const PLAYER_COH_FORCE = 0.065;
-const PLAYER_VEL_FORCE = 0.0035;
+const PLAYER_COH_FORCE = 0.015;
+const PLAYER_VEL_FORCE = 0.001;
 
 const TARGET_RAN_FORCE = 0.2;
 const TARGET_FORCE = 0.05;
@@ -129,7 +129,7 @@ class Boid{
 			//Cohesion
 			avg_pos[0] = avg_pos[0] / total_local_boids;
 			avg_pos[1] = avg_pos[1] / total_local_boids;
-			this.turn(this.get_ang(avg_pos),(this.target_md ? 1.15 : 1)*COH_FORCE);
+			this.turn(this.get_ang(avg_pos),(this.target_md ? 0.5 : 1)*COH_FORCE);
 
 		}
 	}

@@ -346,7 +346,7 @@ function game_tick(event){
 	if(player.speed > 4 && Boid.totalBoids < 5 && map.is_transit) {
 		let num_new_boids = ran_b(6,12);
 		for(let n=0;n<num_new_boids;n++){
-			new Albatross(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-50,50), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-50,50), player.xs * -12, player.ys * -12,360);
+			new Albatross(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-200,200), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-200,200), player.xs * -12, player.ys * -12,360);
 		}
 	}
 
