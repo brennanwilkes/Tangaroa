@@ -4,14 +4,16 @@ class Albatross extends Boid{
 
 		if(Math.random() < 0.9){
 			this.img.src = "assets/albatross/albatross-sprite-sheet.png"
+			this.animspeed = ran_b(12,20);
 		}
 		else{
 			this.img.src = "assets/albatross/albatross-grey-sprite-sheet.png"
+			this.animspeed = ran_b(24,40);
 		}
 
 		this.totalframes = 10;
 		this.frame = ran_b(0,this.totalframes-1);
-		this.animspeed = ran_b(12,20);
+
 	}
 
 	draw(ctx,offsetx,offsety){

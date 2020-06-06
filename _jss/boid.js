@@ -109,7 +109,7 @@ class Boid{
 
 					//separation
 					//console.log((1-(this.distance(Boid.boids[b]) / VIEW_DIST)),Math.pow((1-(this.distance(Boid.boids[b]) / VIEW_DIST)),0.5))
-					this.turn(this.get_ang(Boid.boids[b].position),(this.target_md ? 0.15 : 1)*SEP_FORCE*Math.pow((1-(this.distance(Boid.boids[b]) / VIEW_DIST)),0.1));
+					this.turn(this.get_ang(Boid.boids[b].position),(this.distance(Boid.boids[b])<25 ? 10 : 1 ) * (this.target_md ? 0.15 : 1)*SEP_FORCE*Math.pow((1-(this.distance(Boid.boids[b]) / VIEW_DIST)),0.1));
 
 					//cohesion
 					avg_pos[0] += Boid.boids[b].position[0];
