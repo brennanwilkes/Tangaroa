@@ -34,6 +34,7 @@ class Boid{
 		this.flee = false;
 
 		this.img = new Image();
+		this.boidTypeID = 0;
 
 		this.slowdown = slowdown;
 		this.target_md = target;

@@ -106,6 +106,13 @@ function draw_screen(){
 
 	map.draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 
+	//Draw Mantas
+	for(let b = 0; b < Boid.totalBoids; b++){
+		if(Boid.boids[b].boidTypeID === 2){
+			Boid.boids[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
+		}
+	}
+
 	for(let p = 0; p < player.particles.length; p++){
 		if(player.particles[p].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2)){
 			player.particles.splice(p, 1);
@@ -122,8 +129,12 @@ function draw_screen(){
 	ctx.drawImage(player.img, player.img.width/player.totalframes * player.frame, 0, player.img.width/player.totalframes, player.img.height, -2, 0, player.img.width/player.totalframes, player.img.height); //why the -2? I have no idea
 	ctx.restore();
 
+
+	//Draw Albatrosses
 	for(let b = 0; b < Boid.totalBoids; b++){
-		Boid.boids[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
+		if(Boid.boids[b].boidTypeID === 1){
+			Boid.boids[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
+		}
 	}
 
 	map.draw_lighting(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
@@ -148,14 +159,21 @@ function menu_tick(){
 		if(Boid.totalBoids > 0){
 			Boid.boids[0].kill(true);
 		}
-		let num_new_boids = ran_b(6,18);
 		let sx = ran_b(0,1) === 0 ? -1 : 1;
 		let sy = ran_b(0,1) === 0 ? -1 : 1;
-
 		menu_target = [sx*MAX_X*-2/3,sy*MAX_Y*-2/3];
 
+		let type = (Math.random() > 0.5);
+		let num_new_boids = (type ? ran_b(2,6) : ran_b(6,18));
+
+
 		for(let n=0;n<num_new_boids;n++){
-			new Albatross(sx*MAX_X*2/3 + ran_b(-100,100), sy*MAX_X*2/3 + ran_b(-100,100),sx*-1,sy*-1,0,true);
+			if(type){
+				new Manta(sx*MAX_X*2/3 + ran_b(-100,100), sy*MAX_X*2/3 + ran_b(-100,100),sx*-1,sy*-1,0,true);
+			}
+			else{
+				new Albatross(sx*MAX_X*2/3 + ran_b(-100,100), sy*MAX_X*2/3 + ran_b(-100,100),sx*-1,sy*-1,0,true);
+			}
 		}
 	}
 
@@ -345,8 +363,14 @@ function game_tick(event){
 
 	if(player.speed > 4 && Boid.totalBoids < 5 && map.is_transit) {
 		let num_new_boids = ran_b(6,12);
+		let type = (Math.random() > 0.5);
 		for(let n=0;n<num_new_boids;n++){
-			new Albatross(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-200,200), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-200,200), player.xs * -12, player.ys * -12,360);
+			if(type){
+				new Manta(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-200,200), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-200,200), player.xs * -12, player.ys * -12,360);
+			}
+			else{
+				new Albatross(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-200,200), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-200,200), player.xs * -12, player.ys * -12,360);
+			}
 		}
 	}
 
