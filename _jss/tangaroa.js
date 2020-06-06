@@ -58,7 +58,7 @@ function setUp(){
 	player.totalframes = 9;
 
 	player.img = new Image();
-	player.img.src = "canoe-sprite-Sheet.png";
+	player.img.src = "assets/player/canoe-sprite-Sheet.png";
 
 
 	player.onbeach = false;
@@ -148,7 +148,7 @@ function menu_tick(){
 		if(Boid.totalBoids > 0){
 			Boid.boids[0].kill(true);
 		}
-		let num_new_boids = ran_b(5,20);
+		let num_new_boids = ran_b(6,18);
 		let sx = ran_b(0,1) === 0 ? -1 : 1;
 		let sy = ran_b(0,1) === 0 ? -1 : 1;
 
@@ -157,7 +157,6 @@ function menu_tick(){
 		for(let n=0;n<num_new_boids;n++){
 			new Albatross(sx*MAX_X*2/3 + ran_b(-100,100), sy*MAX_X*2/3 + ran_b(-100,100),sx*-1,sy*-1,0,true);
 		}
-		//Boid.boids[0].img.src = "canoe.png";
 	}
 
 	Boid.boids[tickCount%Boid.totalBoids].ai_tick();
@@ -345,9 +344,9 @@ function game_tick(event){
 	}
 
 	if(player.speed > 4 && Boid.totalBoids < 5 && map.is_transit) {
-		let num_new_boids = ran_b(5,20);
+		let num_new_boids = ran_b(6,12);
 		for(let n=0;n<num_new_boids;n++){
-			new Albatross(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-100,100), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-100,100), Math.cos(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-1,1), Math.sin(player.rot) * Math.sqrt(player.speed)*-10 + ran_b(-1,1),360);
+			new Albatross(player.x+(MAX_X*3/4*Math.cos(player.rot)) + ran_b(-50,50), player.y+(MAX_Y*3/4*Math.sin(player.rot)) + ran_b(-50,50), player.xs * -12, player.ys * -12,360);
 		}
 	}
 

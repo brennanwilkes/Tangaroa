@@ -3,7 +3,7 @@ const COH_FORCE = 0.01;
 const SEP_FORCE = -0.12;
 
 const PLAYER_ALN_FORCE = 0;//.05;
-const PLAYER_COH_FORCE = 0.0535;
+const PLAYER_COH_FORCE = 0.065;
 const PLAYER_VEL_FORCE = 0.0035;
 
 const TARGET_RAN_FORCE = 0.2;
@@ -34,7 +34,6 @@ class Boid{
 		this.flee = false;
 
 		this.img = new Image();
-		this.img.src = "boid.png";
 
 		this.slowdown = slowdown;
 		this.target_md = target;
@@ -74,7 +73,6 @@ class Boid{
 
 	target_tick(target,target_vel){
 		this.turn(this.get_ang([target[0],target[1]]),TARGET_FORCE);
-		this.turn(this.get_ang([this.position[0]+ran_b(-1000,1000),this.position[1]+ran_b(-1000,1000)]),TARGET_RAN_FORCE);
 		this.match_vel([0,0],TARGET_VEL_FORCE);
 	}
 
@@ -84,10 +82,10 @@ class Boid{
 			this.turn(player.rot+(this.get_ang() > player.rot ? Math.PI/2 : Math.PI/-2),2*PLAYER_ALN_FORCE);
 		}
 		else{
-			this.turn(this.get_ang([player.x + (player.xs*1), player.y + (player.ys*1)]),PLAYER_COH_FORCE);
+			this.turn(this.get_ang([player.x, player.y]),PLAYER_COH_FORCE);
 			this.turn(player.rot,PLAYER_ALN_FORCE);
 			if(VIEW_DIST > boid_dist(this.position,[player.x,player.y])){
-				this.match_vel([player.xs*1.25,player.ys*1.25],PLAYER_VEL_FORCE);
+				this.match_vel([player.xs,player.ys],PLAYER_VEL_FORCE);
 			};
 		}
 	}
@@ -139,7 +137,7 @@ class Boid{
 
 	tick(){
 		if(this.slowdown > 0) {
-			this.slowdown = 0;
+			this.slowdown--;
 		}
 		else if(this.slowdown === -1 ){
 			this.velocity[0] *= 1.001;
