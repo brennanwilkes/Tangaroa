@@ -13,6 +13,8 @@ class Particle{
 
 		this. mirror = mirror;
 
+		Particle.totalParticles++;
+		Particle.particles.push(this);
 
 	}
 	draw(ctx,offsetx,offsety){
@@ -31,4 +33,12 @@ class Particle{
 		this.life--;
 		return this.life <= 0;
 	}
+
+	kill(){
+		Particle.particles.splice(Particle.particles.indexOf(this), 1);
+		Particle.totalParticles--;
+	}
+
 }
+Particle.particles = new Array();
+Particle.totalParticles = 0;

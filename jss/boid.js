@@ -168,4 +168,3 @@ class Boid{
 }
 Boid.boids = new Array();
 Boid.totalBoids = 0;
-Boid.centerPoint = [0,0];

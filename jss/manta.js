@@ -2,7 +2,8 @@ class Manta extends Boid{
 	constructor(x, y, xs, ys, slowdown, target=false){
 		super(x,y,xs,ys,slowdown,target);
 
-		this.boidTypeID = 2;
+		Manta.totalMantas++;
+		Manta.mantas.push(this);
 
 		this.img.src = "assets/manta/manta-sprite-sheet.png"
 
@@ -39,4 +40,17 @@ class Manta extends Boid{
 		}
 	}
 
+	kill(all=false){
+		if(all){
+			Manta.mantas = new Array();
+			Manta.totalMantas = 0;
+		}
+		else{
+			Manta.mantas.splice(Manta.mantas.indexOf(this), 1);
+			Manta.totalMantas--;
+		}
+		super.kill(all);
+	}
 }
+Manta.mantas = new Array();
+Manta.totalMantas = 0;

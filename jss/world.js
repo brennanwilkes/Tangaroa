@@ -34,7 +34,7 @@ class Map{
 		this.raw_data = gen_noise_map(this.size, this.size, MAP_SCALE, MAP_OCT, MAP_PERSIST, MAP_LAC, this.seed);
 		for(let x=0; x<this.size;x++){
 			for(let y=0; y<this.size;y++){
-				if(this.raw_data[x][y] < 0.5){
+				if(this.raw_data[x][y] < 0.45){
 					this.raw_data[x][y] = 0;
 				}
 				else{

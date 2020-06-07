@@ -70,8 +70,6 @@ function setUp(){
 	player.down = false;
 	player.space = false;
 
-	player.particles = new Array();
-
 
 	lighting_overlay = document.createElement("div");
 	lighting_overlay.id = "lighting_overlay";
@@ -107,15 +105,13 @@ function draw_screen(){
 	map.draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 
 	//Draw Mantas
-	for(let b = 0; b < Boid.totalBoids; b++){
-		if(Boid.boids[b].boidTypeID === 2){
-			Boid.boids[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
-		}
+	for(let b = 0; b < Manta.totalMantas; b++){
+		Manta.mantas[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 	}
 
-	for(let p = 0; p < player.particles.length; p++){
-		if(player.particles[p].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2)){
-			player.particles.splice(p, 1);
+	for(let p = 0; p < Particle.totalParticles; p++){
+		if(Particle.particles[p].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2)){
+			Particle.particles[p].kill();
 			p--;
 		}
 	}
@@ -131,10 +127,8 @@ function draw_screen(){
 
 
 	//Draw Albatrosses
-	for(let b = 0; b < Boid.totalBoids; b++){
-		if(Boid.boids[b].boidTypeID === 1){
-			Boid.boids[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
-		}
+	for(let b = 0; b < Albatross.totalAlbatrosses; b++){
+		Albatross.albatrosses[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 	}
 
 	map.draw_lighting(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
@@ -143,7 +137,7 @@ function draw_screen(){
 
 function menu_tick(){
 	if(tickCount%10===0){
-		player.particles.push(new Particle(ran_b(MAX_X/-2,MAX_X/2),ran_b(MAX_Y/-2,MAX_Y/2), 0, 0, false, 400 , 4));
+		new Particle(ran_b(MAX_X/-2,MAX_X/2),ran_b(MAX_Y/-2,MAX_Y/2), 0, 0, false, 400 , 4);
 	}
 
 	if(tickCount%25 === 0){
@@ -188,9 +182,9 @@ function menu_tick(){
 
 	clear_screen(DEEP_OCEAN);
 
-	for(let p = 0; p < player.particles.length; p++){
-		if(player.particles[p].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2)){
-			player.particles.splice(p, 1);
+	for(let p = 0; p < Particle.totalParticles; p++){
+		if(Particle.particles[p].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2)){
+			Particle.particles[p].kill();
 			p--;
 		}
 	}
@@ -257,9 +251,9 @@ function game_tick(event){
 			player.ry = Math.max(MAX_Y,map.size[1])*-0.5;
 		}
 
-		for(let p=0;p<player.particles.length;p++){
-			player.particles[p].x = Math.round(player.rx - (player.x - player.particles[p].x));
-			player.particles[p].y = Math.round(player.ry - (player.y - player.particles[p].y));
+		for(let p=0;p<Particle.totalParticles;p++){
+			Particle.particles[p].x = Math.round(player.rx - (player.x - Particle.particles[p].x));
+			Particle.particles[p].y = Math.round(player.ry - (player.y - Particle.particles[p].y));
 		}
 		for(let boi=0; boi<Boid.totalBoids; boi++){
 			Boid.boids[boi].position[0] = Math.round(player.rx - (player.x - Boid.boids[boi].position[0]));
@@ -305,16 +299,16 @@ function game_tick(event){
 			for(let i=0.05;i<1;i+=0.25){
 
 				//main boat particles
-				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, true, (30 + 5*(1-i)*player.speed*12), Math.round(6*(1-i)/1) ));
-				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, false, (30 + 5*(1-i)*player.speed*12), Math.round(6*(1-i)/1) ));
+				new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, true, (30 + 5*(1-i)*player.speed*12), Math.round(6*(1-i)/1));
+				new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, false, (30 + 5*(1-i)*player.speed*12), Math.round(6*(1-i)/1));
 
 
 				//constructor(x, y, speed, rot, mirror, life = 60, size=4){
 
 
 				//side boat particles
-				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, true, (30 + 5*(1-i)*player.speed*2), Math.round(3*(1-i)/1), -10.5 ));
-				player.particles.push(new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, false, (30 + 5*(1-i)*player.speed*2), Math.round(3*(1-i)/1), -10.5 ));
+				new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, true, (30 + 5*(1-i)*player.speed*2), Math.round(3*(1-i)/1), -10.5);
+				new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, false, (30 + 5*(1-i)*player.speed*2), Math.round(3*(1-i)/1), -10.5);
 			}
 		}
 	}
@@ -324,7 +318,7 @@ function game_tick(event){
 			part_x = player.speed < 6 ? ran_b(player.x-MAX_X/2,player.x+MAX_X/2) : ran_b(Math.round(player.x-MAX_X/1.5),Math.round(player.x+MAX_X/1.5)) ;
 			part_y = player.speed < 6 ? ran_b(player.y-MAX_Y/2,player.y+MAX_Y/2) : ran_b(Math.round(player.y-MAX_Y/1.5),Math.round(player.y+MAX_Y/1.5)) ;
 			if(!map.onbeach(part_x,part_y) && !map.onground(part_x,part_y)){
-				player.particles.push(new Particle(part_x,part_y, 0, 0, false, 400 , 4));
+				new Particle(part_x,part_y, 0, 0, false, 400 , 4);
 				break
 			}
 		}

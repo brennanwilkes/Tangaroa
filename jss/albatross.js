@@ -2,7 +2,8 @@ class Albatross extends Boid{
 	constructor(x, y, xs, ys, slowdown, target=false){
 		super(x,y,xs,ys,slowdown,target);
 
-		this.boidTypeID = 1;
+		Albatross.totalAlbatrosses++;
+		Albatross.albatrosses.push(this);
 
 		if(Math.random() < 0.9){
 			this.img.src = "assets/albatross/albatross-sprite-sheet.png"
@@ -37,4 +38,17 @@ class Albatross extends Boid{
 		}
 	}
 
+	kill(all=false){
+		if(all){
+			Albatross.albatrosses = new Array();
+			Albatross.totalAlbatrosses = 0;
+		}
+		else{
+			Albatross.albatrosses.splice(Albatross.albatrosses.indexOf(this), 1);
+			Albatross.totalAlbatrosses--;
+		}
+		super.kill(all);
+	}
 }
+Albatross.albatrosses = new Array();
+Albatross.totalAlbatrosses = 0;
