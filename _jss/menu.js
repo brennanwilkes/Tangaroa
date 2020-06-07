@@ -7,7 +7,7 @@ function QuickPlay(event){
 }
 
 function NewGame(event){
-	world = new Map(false,7);
+	world = new Map(false,5);
 	start_game();
 }
 

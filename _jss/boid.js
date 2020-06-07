@@ -31,7 +31,7 @@ class Boid{
 		this.velocity = [xs, ys];
 		this.dir = bound_ang(this.get_ang(this.velocity));
 
-		this.flee = false;
+		this.flee = 0;
 
 		this.img = new Image();
 		this.boidTypeID = 0;
@@ -78,9 +78,12 @@ class Boid{
 	}
 
 	player_tick(player){
-		if(this.flee){
+		if(this.flee === 1){
 			this.turn(this.get_ang([player.x,player.y]),-1*PLAYER_COH_FORCE);
 			this.turn(player.rot+(this.get_ang() > player.rot ? Math.PI/2 : Math.PI/-2),2*PLAYER_ALN_FORCE);
+		}
+		else if(this.flee === 2){
+			this.turn(this.get_ang([player.x,player.y]),-10*PLAYER_COH_FORCE);
 		}
 		else{
 			this.turn(this.get_ang([player.x, player.y]),PLAYER_COH_FORCE);
