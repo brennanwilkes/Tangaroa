@@ -266,11 +266,7 @@ function game_tick(event){
 			Boid.boids[boi].position[1] = Math.round(player.ry - (player.y - Boid.boids[boi].position[1]));
 		}
 
-		if(!map.is_transit){
-			for(let b = 0; b < Boid.totalBoids; b++){
-				Boid.boids[b].flee = 2;
-			}
-		}
+
 
 
 		player.x = Math.round(player.rx);
@@ -382,6 +378,9 @@ function game_tick(event){
 
 
 	for(let b = 0; b < Boid.totalBoids; b++){
+		if(!map.is_transit){
+			Boid.boids[b].flee = 2;
+		}
 		if(Boid.boids[b].slowdown === 0){
 			if(Boid.boids[b].flee === 0 && (player.speed < 5 || !Boid.boids[b].within_player_sight(player))){
 				Boid.boids[b].flee = 1;
