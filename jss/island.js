@@ -207,12 +207,15 @@ class IslandSettings{
 
 
 function generate_random_island(settings=new IslandSettings()){
+	return new Island(0,settings.seed,settings.size_x,settings.size_y,settings.x,settings.y);
+	/*
 	if(settings.type === 0){
 		return new Island(0,settings.seed,settings.size_x,settings.size_y,settings.x,settings.y);
 	}
 	else if(settings.type === 1){
 		return new IslandCluster(settings.seed,settings.size_x,settings.size_y,settings.x,settings.y);
 	}
+	*/
 }
 
 class IslandCopy{
@@ -556,6 +559,9 @@ class IslandCopy{
 					}
 				}
 			}
+			if(this.town_desgin.length <= 3){
+				this.town_desgin[0][2] = 0;
+			}
 		}
 	}
 
@@ -870,7 +876,8 @@ class TransitIsland{
 
 }
 
-Island.graphics = [new Image(),new Image(),new Image()];
+Island.graphics = [new Image(),new Image(),new Image(), new Image()];
 Island.graphics[0].src = "assets/town/fale.png";
 Island.graphics[1].src = "assets/town/fale2.png";
 Island.graphics[2].src = "assets/town/stones.png";
+Island.graphics[3].src = "assets/town/coconut-tree.png";

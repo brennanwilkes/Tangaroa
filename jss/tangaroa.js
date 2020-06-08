@@ -260,7 +260,9 @@ function game_tick(event){
 			Boid.boids[boi].position[1] = Math.round(player.ry - (player.y - Boid.boids[boi].position[1]));
 		}
 
-
+		if(!map.is_transit){
+			map.bake_lighting();
+		}
 
 
 		player.x = Math.round(player.rx);
