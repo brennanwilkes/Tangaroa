@@ -876,8 +876,9 @@ class TransitIsland{
 
 }
 
-Island.graphics = [new Image(),new Image(),new Image(), new Image()];
+Island.graphics = [new Image(),new Image(),new Image(), new Image(), new Image()];
 Island.graphics[0].src = "assets/town/fale.png";
 Island.graphics[1].src = "assets/town/fale2.png";
 Island.graphics[2].src = "assets/town/stones.png";
 Island.graphics[3].src = "assets/town/coconut-tree.png";
+Island.graphics[4].src = "assets/town/coconut-tree2.png";
