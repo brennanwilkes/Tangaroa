@@ -528,8 +528,7 @@ class IslandCopy{
 						let town_coord;
 						for(let t=0;t<this.town_desgin.length;t++){
 							do{
-								this.town_desgin[t] = [hash(hash(this.seed-12)-(t+shift))%6-3,hash(hash(this.seed-13)-(t+shift))%6-3,hash(hash(this.seed-13)-(t+shift))%2];
-
+								this.town_desgin[t] = [hash(hash(this.seed-12)-(t+shift))%6-3,hash(hash(this.seed-13)-(t+shift))%6-3,hash(hash(this.seed-13)-(t+shift))%Island.graphics.length];
 								shift++;
 								town_coord = this.raw_data[x+this.town_desgin[t][0]*ISLAND_PIXEL_SCALE*8][y+this.town_desgin[t][1]*ISLAND_PIXEL_SCALE*8];
 							}
@@ -548,9 +547,8 @@ class IslandCopy{
 					t--;
 				}
 				else{
-
-					for(let x=Math.floor(Island.graphics[this.town_desgin[t][2]][0]/-3);x<Math.floor(Island.graphics[this.town_desgin[t][2]][0]/3);x++){
-						for(let y=Math.floor(Island.graphics[this.town_desgin[t][2]][1]/-3);y<Math.floor(Island.graphics[this.town_desgin[t][2]][1]/3);y++){
+					for(let x=Math.floor(Island.graphics[this.town_desgin[t][2]].width/-3);x<Math.floor(Island.graphics[this.town_desgin[t][2]].width/3);x++){
+						for(let y=Math.floor(Island.graphics[this.town_desgin[t][2]].height/-3);y<Math.floor(Island.graphics[this.town_desgin[t][2]].height/3);y++){
 							if(x+y <= 2 ){
 								this.raw_data[this.town[0]+this.town_desgin[t][0]*ISLAND_PIXEL_SCALE*8+x][this.town[1]+this.town_desgin[t][1]*ISLAND_PIXEL_SCALE*8+y] += TOWN_HEIGHT;
 							}
@@ -692,13 +690,7 @@ class IslandCopy{
 		setTimeout(function(){
 			if(temp_this.town != undefined && temp_this.town.length === 2 && temp_this.town_desgin!=undefined){
 				for(let b=0; b < temp_this.town_desgin.length; b++){
-
-					if(temp_this.town_desgin[b][2] === 0){
-						ctx_img.drawImage(Island.faleImg, temp_this.town[0]+temp_this.town_desgin[b][0]*ISLAND_PIXEL_SCALE*8 - Island.faleImg.width/2, temp_this.town[1]+temp_this.town_desgin[b][1]*ISLAND_PIXEL_SCALE*8 - Island.faleImg.height/2, Island.faleImg.width, Island.faleImg.height);
-					}
-					else{
-						ctx_img.drawImage(Island.fale2Img, temp_this.town[0]+temp_this.town_desgin[b][0]*ISLAND_PIXEL_SCALE*8 - Island.fale2Img.width/2, temp_this.town[1]+temp_this.town_desgin[b][1]*ISLAND_PIXEL_SCALE*8 - Island.fale2Img.height/2, Island.fale2Img.width, Island.fale2Img.height);
-					}
+					ctx_img.drawImage(Island.graphics[temp_this.town_desgin[b][2]], temp_this.town[0]+temp_this.town_desgin[b][0]*ISLAND_PIXEL_SCALE*8 - Island.graphics[temp_this.town_desgin[b][2]].width/2, temp_this.town[1]+temp_this.town_desgin[b][1]*ISLAND_PIXEL_SCALE*8 - Island.graphics[temp_this.town_desgin[b][2]].height/2, Island.graphics[temp_this.town_desgin[b][2]].width, Island.graphics[temp_this.town_desgin[b][2]].height);
 				}
 			}
 			temp_this.canvas_ready = true;
@@ -877,16 +869,7 @@ class TransitIsland{
 	}
 
 }
-Island.faleImg = new Image();
-Island.faleImg.src = "assets/town/fale.png";
 
-Island.fale2Img = new Image();
-Island.fale2Img.src = "assets/town/fale2.png";
-
-Island.fortressImg = new Image();
-Island.fortressImg.src = "assets/town/fortress.png";
-
-Island.graphics = [	[Island.faleImg.width,Island.faleImg.height],
-					[Island.fale2Img.width,Island.fale2Img.height],
-					[Island.fortressImg.width,Island.fortressImg.height],
-					];
+Island.graphics = [new Image(),new Image()];
+Island.graphics[0].src = "assets/town/fale.png";
+Island.graphics[1].src = "assets/town/fale2.png";
