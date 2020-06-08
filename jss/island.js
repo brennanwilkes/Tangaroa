@@ -141,12 +141,12 @@ function colour_round(colour){
 		return 3;
 	}
 	else if(colour  < 0.6){
-		return 4;
-	}
-	else if(colour  < 0.75){
 		return 5;
 	}
-	return 6;
+	else if(colour  < 0.75){
+		return 6;
+	}
+	return 7;
 }
 
 function is_town(val){
@@ -587,11 +587,11 @@ class IslandCopy{
 			//ANGLE MODE
 			//hn = this.raw_data[xx+1][yy+Math.floor(Math.tan(LIGHTING_ANGLE)*1)];
 
-			if(colour_round(h) > colour_round(hn) && colour_round(hn) > 2){
+			if(colour_round(h) > colour_round(hn) && (colour_round(hn) > 2 || colour_round(h)===4)){
 				nextpeak = [xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h];
 			}
 
-			if( peak!=undefined && ((colour_round(peak[2]) > 2 && colour_round(peak[2]) > colour_round(h) ) || colour_round(h)===4)){
+			if( peak!=undefined && (colour_round(peak[2]) > 2 && colour_round(peak[2]) > colour_round(h) || ( colour_round(peak[2])===4 && colour_round(h)===4)  )){
 				ctx_img.fillStyle = "rgba(0, 0, 0, "+get_lighting(peak,[xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h])+")";
 				ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
 
