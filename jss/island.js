@@ -116,14 +116,16 @@ function hash(num){
 
 
 function get_lighting(peak,coord){
-	return (peak[2]-coord[2]+0.2)*(1-(pixel_distance(peak,coord)/LIGHTING_DISTANCE));
+	let val0 = (is_town(peak[2]) ? remove_town(peak[2]) : peak[2]);
+	let val1 = (is_town(coord[2]) ? remove_town(coord[2]) : coord[2]);
+	return (val0-val1+0.2)*(1-(pixel_distance(peak,coord)/LIGHTING_DISTANCE));
 }
 function pixel_distance(peak,coord){
 	return Math.sqrt(Math.pow(coord[0]-peak[0],2)+Math.pow(coord[1]-peak[1],2));
 }
 
 function colour_round(colour){
-	if(colour == TOWN_HEIGHT){
+	if(is_town(colour)){
 		return 4;
 	}
 	else if(colour <0.1){
@@ -145,6 +147,17 @@ function colour_round(colour){
 		return 5;
 	}
 	return 6;
+}
+
+function is_town(val){
+	return (Math.floor(val)%TOWN_HEIGHT === 0 && Math.floor(val) > 0);
+}
+
+function remove_town(val){
+	while(val > TOWN_HEIGHT){
+		val -= TOWN_HEIGHT;
+	}
+	return val;
 }
 
 
@@ -173,7 +186,7 @@ const ISLAND_PIXEL_SCALE = 4;
 var LIGHTING_DISTANCE = 15;
 
 
-const TOWN_HEIGHT = 0.36;
+const TOWN_HEIGHT = 36;
 
 
 let SMALL_SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408];
@@ -237,7 +250,7 @@ class IslandCopy{
 			for(let y=0;y<n_y;y++){
 				for(let xx=0;xx<factor;xx++){
 					for(let yy=0;yy<factor;yy++){
-						comp[x][y] = comp[x][y]===TOWN_HEIGHT ? TOWN_HEIGHT : Math.max(this.raw_data[x*factor+xx][y*factor+yy], comp[x][y]);
+						comp[x][y] = Math.max(this.raw_data[x*factor+xx][y*factor+yy], comp[x][y]);
 					}
 				}
 			}
@@ -275,37 +288,37 @@ class IslandCopy{
 		this.display_data[LAVA_ONE] = new Array();
 		this.display_data[LAVA_TWO] = new Array();
 
+		let adjusted_height;
 		for(let x=0;x<raw_data.length;x++){
 			for(let y=0;y<raw_data[0].length;y++){
 
-				if(raw_data[x][y]<0.1){
+				adjusted_height = (is_town(raw_data[x][y]) ? remove_town(raw_data[x][y]) : raw_data[x][y] );
+
+				if(adjusted_height<0.1){
 					continue;
 				}
-				else if(raw_data[x][y]<0.3){
+				else if(adjusted_height<0.3){
 					this.display_data[SHALLOW_OCEAN].push([x,y]);
 				}
-				else if(raw_data[x][y] < 0.35){
+				else if(adjusted_height < 0.35){
 					this.display_data[BEACH].push([x,y]);
 				}
-				else if(raw_data[x][y] === TOWN_HEIGHT){
-					this.display_data[VILLAGE].push([x,y]);
-				}
-				else if(raw_data[x][y] < 0.45){
+				else if(adjusted_height < 0.45){
 					this.display_data[LAND_ONE].push([x,y]);
 				}
-				else if(raw_data[x][y] < 0.6){
+				else if(adjusted_height < 0.6){
 					this.display_data[LAND_TWO].push([x,y]);
 				}
-				else if(raw_data[x][y] < 0.75){
+				else if(adjusted_height < 0.75){
 					this.display_data[LAND_THREE].push([x,y]);
 				}
-				else if(raw_data[x][y] < 0.9 && raw_data[x][y] > 0.89){
+				else if(adjusted_height < 0.9 && adjusted_height > 0.89){
 					this.display_data[ROCK_ONE].push([x,y]);
 				}
-				else if(raw_data[x][y] < 0.925){
+				else if(adjusted_height < 0.925){
 					this.display_data[ROCK_TWO].push([x,y]);
 				}
-				else if(raw_data[x][y] < 1.1){
+				else if(adjusted_height < 1.1){
 					this.display_data[LAVA_ONE].push([x,y]);
 				}
 				else{
@@ -424,10 +437,6 @@ class IslandCopy{
 			mapMASK[x] = new Array(this.size[1]);
 			for(let y=0;y<this.size[1];y++){
 
-				if(HAS_TOWN === -1 && this.raw_data[x][y] === TOWN_HEIGHT){
-					continue;
-				}
-
 				this.raw_data[x][y] = normalize(this.raw_data[x][y], this.raw_data.minHeight, this.raw_data.maxHeight);
 
 				if(IS_ATOLL){
@@ -511,29 +520,37 @@ class IslandCopy{
 				}
 
 				if(HAS_TOWN === 0){
-					if(Math.abs(this.raw_data[x][y]-TOWN_HEIGHT)<0.01 && ( TOWN_SPAWN_X ? (x > this.size[0]/2) : (x < this.size[0]/2) ) && ( TOWN_SPAWN_Y ? (y > this.size[1]/2) : (y < this.size[1]/2) ) ){
+					if(Math.abs(this.raw_data[x][y]-(TOWN_HEIGHT/100))<0.01 && ( TOWN_SPAWN_X ? (x > this.size[0]/2) : (x < this.size[0]/2) ) && ( TOWN_SPAWN_Y ? (y > this.size[1]/2) : (y < this.size[1]/2) ) ){
 						HAS_TOWN = -1;
 						this.town = [x,y];
-						//let town = TOWN_DESIGN[hash(this.seed-12)%TOWN_DESIGN.length];
-						let town_desgin = new Array((this.seed-12)%8 + 4);
-						town_desgin[0] = [0,0];
-						for(let t=1;t<town_desgin.length;t++){
-							town_desgin[t] = [hash(hash(this.seed-12)-t)%6-3,hash(hash(this.seed-13)-t)%6-3];
+						this.town_desgin = new Array((this.seed-12)%10 + 4);
+						let shift = -1;
+						let town_coord;
+						for(let t=0;t<this.town_desgin.length;t++){
+							do{
+								this.town_desgin[t] = [hash(hash(this.seed-12)-(t+shift))%6-3,hash(hash(this.seed-13)-(t+shift))%6-3];
+								shift++;
+								town_coord = this.raw_data[x+this.town_desgin[t][0]*ISLAND_PIXEL_SCALE*8][y+this.town_desgin[t][1]*ISLAND_PIXEL_SCALE*8];
+							}
+							while(town_coord > 0.45 || (town_coord < 0.3 && town_coord > -1));
 						}
-						//console.log(town_desgin)
-
-						let coordheight;
-						for(let b = 0; b<town_desgin.length; b++){
-							//console.log(x+town_desgin[b][0]*ISLAND_PIXEL_SCALE*3,y+town_desgin[b][1]*ISLAND_PIXEL_SCALE*3)
-							//console.log(this.raw_data[x+town_desgin[b][0]*ISLAND_PIXEL_SCALE*3][y+town_desgin[b][1]*ISLAND_PIXEL_SCALE*3]);
-
-							coordheight = this.raw_data[x+town_desgin[b][0]*ISLAND_PIXEL_SCALE*5][y+town_desgin[b][1]*ISLAND_PIXEL_SCALE*5];
-							if(coordheight < 0 || coordheight >= 0.3){
-								for(let i=0;i<ISLAND_PIXEL_SCALE*4;i++){
-									for(let j=0;j<ISLAND_PIXEL_SCALE*4;j++){
-										this.raw_data[x+town_desgin[b][0]*ISLAND_PIXEL_SCALE*5+i][y+town_desgin[b][1]*ISLAND_PIXEL_SCALE*5+j] = TOWN_HEIGHT;
-									}
-								}
+					}
+				}
+			}
+		}
+		if(HAS_TOWN === -1){
+			let town_coord;
+			for(let t=0;t<this.town_desgin.length;t++){
+				town_coord = this.raw_data[this.town[0]+this.town_desgin[t][0]*ISLAND_PIXEL_SCALE*8][this.town[1]+this.town_desgin[t][1]*ISLAND_PIXEL_SCALE*8];
+				if(town_coord > 0.45 || (town_coord < 0.3 && town_coord > -1)){
+					this.town_desgin.splice(t,1);
+					t--;
+				}
+				else{
+					for(let x=Math.floor(Island.faleImg.width/-3);x<Math.floor(Island.faleImg.width/3);x++){
+						for(let y=Math.floor(Island.faleImg.height/-3);y<Math.floor(Island.faleImg.height/3);y++){
+							if(x+y <= 2 ){
+								this.raw_data[this.town[0]+this.town_desgin[t][0]*ISLAND_PIXEL_SCALE*8+x][this.town[1]+this.town_desgin[t][1]*ISLAND_PIXEL_SCALE*8+y] += TOWN_HEIGHT;
 							}
 						}
 					}
@@ -566,6 +583,7 @@ class IslandCopy{
 			h = this.raw_data[xx][yy];
 			hn = this.raw_data[xx+1][yy+1];
 
+
 			//ANGLE MODE
 			//hn = this.raw_data[xx+1][yy+Math.floor(Math.tan(LIGHTING_ANGLE)*1)];
 
@@ -573,7 +591,7 @@ class IslandCopy{
 				nextpeak = [xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h];
 			}
 
-			if( peak!=undefined && colour_round(peak[2]) > 2 && colour_round(peak[2]) > colour_round(h)){
+			if( peak!=undefined && ((colour_round(peak[2]) > 2 && colour_round(peak[2]) > colour_round(h) ) || colour_round(h)===4)){
 				ctx_img.fillStyle = "rgba(0, 0, 0, "+get_lighting(peak,[xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,h])+")";
 				ctx_img.fillRect(xx*ISLAND_PIXEL_SCALE,yy*ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE,ISLAND_PIXEL_SCALE);
 
@@ -638,6 +656,7 @@ class IslandCopy{
 		}
 	}
 
+
 	gen_ctx_img(){
 		this.canvas_img = document.createElement('canvas');
 		if(this.is_map_island){
@@ -665,7 +684,15 @@ class IslandCopy{
 			this.canvas_ready = true;
 			return;
 		}
+
+
+
 		setTimeout(function(){
+			if(temp_this.town != undefined && temp_this.town.length === 2 && temp_this.town_desgin!=undefined){
+				for(let b=0; b < temp_this.town_desgin.length; b++){
+					ctx_img.drawImage(Island.faleImg, temp_this.town[0]+temp_this.town_desgin[b][0]*ISLAND_PIXEL_SCALE*8 - Island.faleImg.width/2, temp_this.town[1]+temp_this.town_desgin[b][1]*ISLAND_PIXEL_SCALE*8 - Island.faleImg.height/2, Island.faleImg.width, Island.faleImg.height);
+				}
+			}
 			temp_this.canvas_ready = true;
 		},delay+25);
 	}
@@ -800,6 +827,7 @@ class IslandCluster extends Island{
 				if(island.town[0] != -1){
 					this.town[0] = x+island.town[0];
 					this.town[1] = y+island.town[1];
+					this.town_desgin = island.town_desgin;
 				}
 				this.blend(island,x,y);
 			}
@@ -841,3 +869,5 @@ class TransitIsland{
 	}
 
 }
+Island.faleImg = new Image();
+Island.faleImg.src = "assets/town/fale.png";
