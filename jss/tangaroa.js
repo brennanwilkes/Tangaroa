@@ -104,6 +104,13 @@ function draw_screen(){
 
 	map.draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 
+	//Draw Villagers
+	for(let v = 0; v < Villager.totalVillagers; v++){
+		Villager.villagers[v].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
+	}
+
+	map.draw_objects(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
+
 	//Draw Mantas
 	for(let b = 0; b < Manta.totalMantas; b++){
 		Manta.mantas[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
@@ -131,10 +138,7 @@ function draw_screen(){
 		Albatross.albatrosses[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 	}
 
-	//Draw Villagers
-	for(let v = 0; v < Villager.totalVillagers; v++){
-		Villager.villagers[v].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
-	}
+
 
 	map.draw_lighting(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 

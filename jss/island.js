@@ -374,6 +374,25 @@ class IslandCopy{
 		}
 	}
 
+	draw_objects(ctx,offsetx,offsety){
+		if(this.objects_img === undefined){
+			this.objects_img = document.createElement('canvas');
+			this.objects_img.width = this.size[0];
+			this.objects_img.height = this.size[1];
+
+			let ctx_img = this.objects_img.getContext("2d");
+			if(this.town != undefined && this.town.length === 2 && this.objects!=undefined){
+				for(let b=0; b < this.objects.length; b++){
+					ctx_img.drawImage(Island.graphics[this.objects[b][2]], this.objects[b][0] - Island.graphics[this.objects[b][2]].width/2, this.objects[b][1] - Island.graphics[this.objects[b][2]].height/2, Island.graphics[this.objects[b][2]].width, Island.graphics[this.objects[b][2]].height);
+				}
+			}
+		}
+		else{
+			ctx.drawImage(this.objects_img, offsetx, offsety);
+		}
+
+	}
+
 	draw_lighting(ctx, offsetx, offsety){
 		if(!this.is_map_island){
 			if(this.lighting_img === undefined){
@@ -729,14 +748,7 @@ class IslandCopy{
 			return;
 		}
 
-
-
 		setTimeout(function(){
-			if(temp_this.town != undefined && temp_this.town.length === 2 && temp_this.objects!=undefined){
-				for(let b=0; b < temp_this.objects.length; b++){
-					ctx_img.drawImage(Island.graphics[temp_this.objects[b][2]], temp_this.objects[b][0] - Island.graphics[temp_this.objects[b][2]].width/2, temp_this.objects[b][1] - Island.graphics[temp_this.objects[b][2]].height/2, Island.graphics[temp_this.objects[b][2]].width, Island.graphics[temp_this.objects[b][2]].height);
-				}
-			}
 			temp_this.canvas_ready = true;
 		},delay+25);
 	}
