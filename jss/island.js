@@ -146,6 +146,12 @@ function colour_round(colour){
 	else if(colour  < 0.75){
 		return 6;
 	}
+	else if(colour < 0.9 && colour > 0.89){
+		return 9;
+	}
+	else if(colour < 0.925){
+		return 8;
+	}
 	return 7;
 }
 
@@ -400,7 +406,7 @@ class IslandCopy{
 		const HAS_MOTU = this.seed%2 === 0;
 		const HAS_REEF = this.seed%4 === 0;
 		const IS_ATOLL = this.seed%2 === 0 && hash(this.seed-100)%4 === 0;
-		const IS_VOLCANO = this.seed%2 === 1 && hash(this.seed-66)%4 === 0;
+		const IS_VOLCANO =this.seed%2 === 1 && hash(this.seed-66)%4 === 0;
 
 		let HAS_TOWN = this.GEN_TOWN;// === 0 ? hash(this.seed+11)%2 : 1;
 
@@ -580,9 +586,14 @@ class IslandCopy{
 	}
 
 	cast_shadow(shadow){
-		for(let x=Math.floor(Island.graphics[shadow[2]].width/-3);x<Math.floor(Island.graphics[shadow[2]].width/3);x++){
-			for(let y=Math.floor(Island.graphics[shadow[2]].height/-3);y<Math.floor(Island.graphics[shadow[2]].height/3);y++){
-				if(x+y <= 2 ){
+		if(Island.graphics[shadow[2]].shadowScale < 0.05){
+			return;
+		}
+
+		let scl = 3 / Island.graphics[shadow[2]].shadowScale;
+		for(let x=Math.floor(Island.graphics[shadow[2]].width/(-1*scl));x<Math.floor(Island.graphics[shadow[2]].width/scl);x++){
+			for(let y=Math.floor(Island.graphics[shadow[2]].height/(-1*scl));y<Math.floor(Island.graphics[shadow[2]].height/scl);y++){
+				if(Math.abs(x+y) <= 2 ){
 					this.raw_data[shadow[0]+x][shadow[1]+y] += TOWN_HEIGHT;
 				}
 			}
@@ -900,14 +911,27 @@ class TransitIsland{
 
 }
 
-Island.graphics = [new Image(),new Image(),new Image(), new Image(), new Image()];
+Island.graphics = new Array();
+for(let img = 0; img<7; img++){
+	Island.graphics[img] = new Image();
+}
+
 
 Island.numVillageGraphics = 3;
 Island.graphics[0].src = "assets/town/fale.png";
+Island.graphics[0].shadowScale = 0.8;
 Island.graphics[1].src = "assets/town/fale2.png";
+Island.graphics[1].shadowScale = 0.8;
 Island.graphics[2].src = "assets/town/stones.png";
+Island.graphics[2].shadowScale = 0;
 
-Island.numTreeGraphics = 2;
-Island.shiftTreeGraphics = 3;
+Island.numTreeGraphics = 3;
+Island.shiftTreeGraphics = 4;
 Island.graphics[3].src = "assets/trees/coconut-tree.png";
+Island.graphics[3].shadowScale = 1;
 Island.graphics[4].src = "assets/trees/coconut-tree2.png";
+Island.graphics[4].shadowScale = 1;
+Island.graphics[5].src = "assets/trees/coconut-tree3.png";
+Island.graphics[5].shadowScale = 1;
+Island.graphics[6].src = "assets/trees/taro.png";
+Island.graphics[6].shadowScale = 0.25;
