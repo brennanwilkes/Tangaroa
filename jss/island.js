@@ -187,6 +187,7 @@ var LIGHTING_DISTANCE = 15;
 
 
 const TOWN_HEIGHT = 36;
+const SPRITE_SIZE = 8;
 
 
 let SMALL_SIZES = [256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408];
@@ -534,30 +535,32 @@ class IslandCopy{
 		this.objects = new Array();
 		if(HAS_TOWN === -1){
 			let town_buildings = (this.seed-12)%4 + 4;
-			this.gen_obj(0,Island.numVillageGraphics,town_buildings,6,6,0.3,0.45,-1,this.town[0],this.town[1]);
+			this.gen_obj(0,Island.numVillageGraphics,town_buildings,6,6,0.3,0.45,500,this.town[0],this.town[1]);
 
 			if(this.objects.length <= 3){
 				this.objects[0][2] = 0;
 			}
 		}
 
-		let numTrees = (this.seed-12)%50 + 50;
-		this.gen_obj(Island.shiftTreeGraphics,Island.numTreeGraphics,numTrees,15,15,0.35,0.45,-100,Math.floor(this.size[0]/2),Math.floor(this.size[1]/2));
+		let numTrees = (this.seed-12)%500 + 500;
+		this.gen_obj(Island.shiftTreeGraphics,Island.numTreeGraphics,numTrees,-1,-1,0.35,0.4,700,Math.floor(this.size[0]/2),Math.floor(this.size[1]/2));
 
 	}
 
 	gen_obj(graphicStart,graphicShift,numObj,spreadX,spreadY,rangeMin,rangeMax,hashShift,originX,originY){
-		let shift = hashShift;
+		spreadX = (spreadX===-1 ? Math.floor(this.size[0]/SPRITE_SIZE/ISLAND_PIXEL_SCALE/2) : spreadX);
+		spreadY = (spreadY===-1 ? Math.floor(this.size[1]/SPRITE_SIZE/ISLAND_PIXEL_SCALE/2) : spreadY);
+		let shift = 0;
 		let obj_coord;
 		let a,b,c;
 		let len = this.objects.length;
 		for(let t=len;t<numObj+len;t++){
 			do{
 				a = hash(hash(this.seed-12)-(t+shift))%spreadX-Math.floor(spreadX/2);
-				a =  originX+a*ISLAND_PIXEL_SCALE*8;
-				b = hash(hash(this.seed-13)-(t+shift))%spreadY-Math.floor(spreadY/2);
-				b = originY+b*ISLAND_PIXEL_SCALE*8;
-				c = hash(hash(this.seed-13)-(t+shift))%graphicShift + graphicStart;
+				a =  originX+a*ISLAND_PIXEL_SCALE*SPRITE_SIZE;
+				b = hash(hash(this.seed-13)-(t+shift+hashShift))%spreadY-Math.floor(spreadY/2);
+				b = originY+b*ISLAND_PIXEL_SCALE*SPRITE_SIZE;
+				c = hash(hash(this.seed-13)-(t+shift+hashShift))%graphicShift + graphicStart;
 				this.objects[t] = [a,b,c];
 				shift++;
 				if(a < 0 || a >= this.size[0]*3/4 || b < 0 || b >= this.size[1]*3/4){
@@ -567,8 +570,8 @@ class IslandCopy{
 					obj_coord = this.raw_data[a][b];
 				}
 			}
-			while((obj_coord > rangeMax || obj_coord < rangeMin || obj_coord===-1) && shift < 200+hashShift);
-			if(shift >= 200+hashShift){
+			while((obj_coord > rangeMax || obj_coord < rangeMin || obj_coord===-1) && shift < 200 + numObj*2);
+			if(shift >= numObj*2){
 				this.objects.splice(t,this.objects.length-t);
 				break;
 			}
@@ -906,5 +909,5 @@ Island.graphics[2].src = "assets/town/stones.png";
 
 Island.numTreeGraphics = 2;
 Island.shiftTreeGraphics = 3;
-Island.graphics[3].src = "assets/town/coconut-tree.png";
-Island.graphics[4].src = "assets/town/coconut-tree2.png";
+Island.graphics[3].src = "assets/trees/coconut-tree.png";
+Island.graphics[4].src = "assets/trees/coconut-tree2.png";
