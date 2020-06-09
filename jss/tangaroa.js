@@ -131,6 +131,11 @@ function draw_screen(){
 		Albatross.albatrosses[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 	}
 
+	//Draw Villagers
+	for(let v = 0; v < Villager.totalVillagers; v++){
+		Villager.villagers[v].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
+	}
+
 	map.draw_lighting(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 
 }
@@ -215,40 +220,40 @@ function game_tick(event){
 
 
 	//move in world
-	if((player.rx < Math.max(MAX_X,map.size[0])*-1) || (player.rx > Math.max(MAX_X,map.size[0])*2) || (player.ry < Math.max(MAX_Y,map.size[1])*-1) || (player.ry > Math.max(MAX_Y,map.size[1])*2)){
+	if((player.rx < Math.max(MAX_X,map.size[0])*-1.5) || (player.rx > Math.max(MAX_X,map.size[0])*3) || (player.ry < Math.max(MAX_Y,map.size[1])*-1.5) || (player.ry > Math.max(MAX_Y,map.size[1])*3)){
 
 		if(!map.is_transit){
 			map.unload();
 		}
 
 		//go left
-		if(player.rx < Math.max(MAX_X,map.size[0])*-1){
+		if(player.rx < Math.max(MAX_X,map.size[0])*-1.5){
 			player.wx--;
 			map = world.get(player.wx,player.wy);
-			player.rx = Math.max(MAX_X,map.size[0])*3/2;
+			player.rx = Math.max(MAX_X,map.size[0])*5/3;
 			player.ry = Math.max(MAX_Y,map.size[1])/2;
 		}
 		//go right
-		else if(player.rx > Math.max(MAX_X,map.size[0])*2){
+		else if(player.rx > Math.max(MAX_X,map.size[0])*3){
 			player.wx++;
 			map = world.get(player.wx,player.wy);
-			player.rx = Math.max(MAX_X,map.size[0])*-0.5;
+			player.rx = Math.max(MAX_X,map.size[0])*-1;
 			player.ry = Math.max(MAX_Y,map.size[1])/2;
 		}
 
 		//go up
-		else if(player.ry < Math.max(MAX_Y,map.size[1])*-1){
+		else if(player.ry < Math.max(MAX_Y,map.size[1])*-1.5){
 			player.wy--;
 			map = world.get(player.wx,player.wy);
 			player.rx = Math.max(MAX_X,map.size[0])/2;
-			player.ry = Math.max(MAX_Y,map.size[1])*3/2;
+			player.ry = Math.max(MAX_Y,map.size[1])*5/2;
 		}
 		//go down
-		else if(player.ry > Math.max(MAX_Y,map.size[1])*2){
+		else if(player.ry > Math.max(MAX_Y,map.size[1])*3){
 			player.wy++;
 			map = world.get(player.wx,player.wy);
 			player.rx = Math.max(MAX_X,map.size[0])/2;
-			player.ry = Math.max(MAX_Y,map.size[1])*-0.5;
+			player.ry = Math.max(MAX_Y,map.size[1])*-1;
 		}
 
 		for(let p=0;p<Particle.totalParticles;p++){
@@ -263,6 +268,8 @@ function game_tick(event){
 		if(!map.is_transit){
 			map.bake_lighting();
 		}
+		Villager.villagers = new Array();
+		Villager.totalVillagers = 0;
 
 
 		player.x = Math.round(player.rx);
@@ -366,10 +373,13 @@ function game_tick(event){
 		}
 	}
 
-	//let tmp_boi = Boid.boids[tickCount%Boid.totalBoids];
 	if(Boid.totalBoids > 0){
 		Boid.boids[tickCount%Boid.totalBoids].ai_tick();
 		//player.particles.push(new Particle(tmp_boi.position[0],tmp_boi.position[1], 0, 0, false, 50 , 6));
+	}
+
+	for(let v = 0; v < Villager.totalVillagers; v++){
+		Villager.villagers[v].tick(tickCount);
 	}
 
 

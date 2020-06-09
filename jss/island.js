@@ -118,7 +118,7 @@ function hash(num){
 function get_lighting(peak,coord){
 	let val0 = (is_town(peak[2]) ? remove_town(peak[2]) : peak[2]);
 	let val1 = (is_town(coord[2]) ? remove_town(coord[2]) : coord[2]);
-	return (val0-val1+0.2)*(1-(pixel_distance(peak,coord)/LIGHTING_DISTANCE));
+	return (val0-val1+0.2)*(1-(Math.pow(pixel_distance(peak,coord),1.25)/LIGHTING_DISTANCE));
 }
 function pixel_distance(peak,coord){
 	return Math.sqrt(Math.pow(coord[0]-peak[0],2)+Math.pow(coord[1]-peak[1],2));
@@ -551,6 +551,9 @@ class IslandCopy{
 		let numTrees = (this.seed-12)%500 + 500;
 		this.gen_obj(Island.shiftTreeGraphics,Island.numTreeGraphics,numTrees,-1,-1,0.35,0.4,700,Math.floor(this.size[0]/2),Math.floor(this.size[1]/2));
 
+		let numPlants = (this.seed-12)%100+250;
+		this.gen_obj(Island.shiftPlantGraphics,Island.numPlantGraphics,numPlants,-1,-1,0.375,0.425,700,Math.floor(this.size[0]/2),Math.floor(this.size[1]/2));
+
 	}
 
 	gen_obj(graphicStart,graphicShift,numObj,spreadX,spreadY,rangeMin,rangeMax,hashShift,originX,originY){
@@ -926,12 +929,15 @@ Island.graphics[2].src = "assets/town/stones.png";
 Island.graphics[2].shadowScale = 0;
 
 Island.numTreeGraphics = 3;
-Island.shiftTreeGraphics = 4;
+Island.shiftTreeGraphics = 3;
 Island.graphics[3].src = "assets/trees/coconut-tree.png";
 Island.graphics[3].shadowScale = 1;
 Island.graphics[4].src = "assets/trees/coconut-tree2.png";
 Island.graphics[4].shadowScale = 1;
 Island.graphics[5].src = "assets/trees/coconut-tree3.png";
 Island.graphics[5].shadowScale = 1;
+
+Island.numPlantGraphics = 1;
+Island.shiftPlantGraphics = 6;
 Island.graphics[6].src = "assets/trees/taro.png";
 Island.graphics[6].shadowScale = 0.25;
