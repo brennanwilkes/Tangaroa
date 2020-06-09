@@ -11,7 +11,7 @@ class Villager{
 		this.rot = Math.random()*Math.PI*2;
 
 		this.walk_time = 200;
-		this.current_walk = Math.floor(Math.random()*this.walk_time*11 - this.walk_time*10);
+		this.current_walk = Math.floor(Math.random()*this.walk_time*3);
 
 		Villager.totalVillagers++;
 		Villager.villagers.push(this);

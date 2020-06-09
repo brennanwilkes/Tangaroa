@@ -566,7 +566,7 @@ class IslandCopy{
 				this.objects[0][2] = 0;
 			}
 
-			this.num_villagers = 3 + hash(this.seed+169)%7;
+			this.num_villagers = 3 + hash(this.seed+169)%3;
 
 		} else{
 			this.num_villagers = 0;
