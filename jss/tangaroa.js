@@ -104,6 +104,10 @@ function draw_screen(){
 
 	map.draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 
+	if(!map.is_transit && Villager.totalVillagers < map.num_villagers && map.town[0] !== -1){
+		new Villager(map.town[0],map.town[1])
+	}
+
 	//Draw Villagers
 	for(let v = 0; v < Villager.totalVillagers; v++){
 		Villager.villagers[v].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
@@ -382,8 +386,9 @@ function game_tick(event){
 		//player.particles.push(new Particle(tmp_boi.position[0],tmp_boi.position[1], 0, 0, false, 50 , 6));
 	}
 
+
 	for(let v = 0; v < Villager.totalVillagers; v++){
-		Villager.villagers[v].tick(tickCount);
+		Villager.villagers[v].tick(tickCount,map);
 	}
 
 

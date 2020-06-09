@@ -562,9 +562,14 @@ class IslandCopy{
 			let town_buildings = (this.seed-12)%4 + 4;
 			this.gen_obj(0,Island.numVillageGraphics,town_buildings,6,6,0.3,0.45,500,this.town[0],this.town[1]);
 
-			if(this.objects.length <= 3){
+			if(this.objects.length <= 3 && this.objects.length > 0){
 				this.objects[0][2] = 0;
 			}
+
+			this.num_villagers = 3 + hash(this.seed+169)%7;
+
+		} else{
+			this.num_villagers = 0;
 		}
 
 		let numTrees = (this.seed-12)%500 + 500;
@@ -572,6 +577,8 @@ class IslandCopy{
 
 		let numPlants = (this.seed-12)%100+250;
 		this.gen_obj(Island.shiftPlantGraphics,Island.numPlantGraphics,numPlants,-1,-1,0.375,0.425,700,Math.floor(this.size[0]/2),Math.floor(this.size[1]/2));
+
+
 
 	}
 
@@ -808,11 +815,16 @@ class Island extends IslandCopy{
 	}
 
 	onbeach(x,y){
-		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[Math.floor(x/ISLAND_PIXEL_SCALE)][Math.floor(y/ISLAND_PIXEL_SCALE)] >= 0.3) && (this.raw_data[Math.floor(x/ISLAND_PIXEL_SCALE)][Math.floor(y/ISLAND_PIXEL_SCALE)] < 0.35);
+		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (remove_town(this.raw_data[Math.floor(x/ISLAND_PIXEL_SCALE)][Math.floor(y/ISLAND_PIXEL_SCALE)]) >= 0.3) && (remove_town(this.raw_data[Math.floor(x/ISLAND_PIXEL_SCALE)][Math.floor(y/ISLAND_PIXEL_SCALE)]) < 0.35);
 	}
 
 	onground(x, y){
-		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (this.raw_data[Math.floor(x/ISLAND_PIXEL_SCALE)][Math.floor(y/ISLAND_PIXEL_SCALE)] >= 0.35);
+		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (remove_town(this.raw_data[Math.floor(x/ISLAND_PIXEL_SCALE)][Math.floor(y/ISLAND_PIXEL_SCALE)]) >= 0.35);
+	}
+
+	onvillagerland(x,y){
+		return (x > 0 && x < this.size[0] && y > 0 && y < this.size[1]) && (remove_town(this.raw_data[Math.floor(x/ISLAND_PIXEL_SCALE)][Math.floor(y/ISLAND_PIXEL_SCALE)]) >= 0.3) && (remove_town(this.raw_data[Math.floor(x/ISLAND_PIXEL_SCALE)][Math.floor(y/ISLAND_PIXEL_SCALE)]) <= 0.45);
+
 	}
 
 	attown(x, y){
@@ -917,6 +929,10 @@ class TransitIsland{
 	}
 
 	onground(x, y){
+		return false;
+	}
+
+	onvillagerland(x,y){
 		return false;
 	}
 
