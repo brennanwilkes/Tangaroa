@@ -133,7 +133,7 @@ class Boid{
 			//Cohesion
 			avg_pos[0] = avg_pos[0] / total_local_boids;
 			avg_pos[1] = avg_pos[1] / total_local_boids;
-			this.turn(this.get_ang(avg_pos),(this.target_md ? 0.5 : 1)*COH_FORCE);
+			this.turn(this.get_ang(avg_pos),(this.target_md ? 0.25 : 1)*COH_FORCE);
 
 		}
 	}

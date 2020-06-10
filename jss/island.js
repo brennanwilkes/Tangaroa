@@ -924,6 +924,7 @@ class TransitIsland{
 
 	draw(ctx, offsetx, offsety){}
 	draw_lighting(ctx, offsetx, offsety){}
+	draw_objects(ctx, offsetx, offsety){}
 	onbeach(x,y){
 		return false;
 	}
