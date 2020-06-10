@@ -60,6 +60,16 @@ function setUp(){
 	player.img = new Image();
 	player.img.src = "assets/player/canoe-sprite-Sheet.png";
 
+	player.walkimg = new Image();
+	player.walkimg.src = "assets/villager/villager-sprite-sheet.png";
+	player.walkspeed = 30;
+	player.walkframe = 0;
+	player.totalwalkframes = 7;
+
+	player.canoe = new Image();
+	player.canoe.src = "assets/player/canoe-empty.png";
+	player.canoepos = new Array();
+
 
 	player.onbeach = false;
 	player.onground = false;
@@ -113,8 +123,6 @@ function draw_screen(){
 		Villager.villagers[v].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 	}
 
-	map.draw_objects(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
-
 	//Draw Mantas
 	for(let b = 0; b < Manta.totalMantas; b++){
 		Manta.mantas[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
@@ -129,13 +137,32 @@ function draw_screen(){
 
 	ctx.save();
 	ctx.translate(MAX_X/2,MAX_Y/2);
-	//ctx.translate(player.img.width*0.025,player.img.height*0.025);
-	ctx.rotate(player.rot);
-	ctx.rotate(Math.PI*-0.5);
-	ctx.translate(player.img.width/player.totalframes/-2,player.img.height/-2);
-	ctx.drawImage(player.img, player.img.width/player.totalframes * player.frame, 0, player.img.width/player.totalframes, player.img.height, -2, 0, player.img.width/player.totalframes, player.img.height); //why the -2? I have no idea
+	ctx.rotate(player.rot - Math.PI/2);
+	if(!player.onground && !player.onbeach){
+		ctx.translate(player.img.width/player.totalframes/-2,player.img.height/-2);
+		ctx.drawImage(player.img, player.img.width/player.totalframes * player.frame, 0, player.img.width/player.totalframes, player.img.height, -2, 0, player.img.width/player.totalframes, player.img.height); //why the -2? I have no idea
+	}
+	else{
+		ctx.translate(player.walkimg.width/player.totalwalkframes/-2,player.walkimg.height/-2);
+		ctx.drawImage(player.walkimg, player.walkimg.width/player.totalwalkframes * player.walkframe, 0, player.walkimg.width/player.totalwalkframes, player.walkimg.height, 0, 0, player.walkimg.width/player.totalwalkframes, player.walkimg.height);
+	}
 	ctx.restore();
 
+	if(player.canoepos.length === 3){
+		ctx.save();
+
+		ctx.translate(MAX_X/2,MAX_Y/2);
+		ctx.translate(player.canoepos[0]-player.x,player.canoepos[1]-player.y);
+
+		ctx.rotate(player.canoepos[2] - Math.PI/2);
+
+		ctx.translate(player.canoe.width/-2,player.canoe.height/-2);
+		ctx.drawImage(player.canoe, 0,0);
+
+		ctx.restore();
+	}
+
+	map.draw_objects(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 
 	//Draw Albatrosses
 	for(let b = 0; b < Albatross.totalAlbatrosses; b++){
@@ -292,7 +319,7 @@ function game_tick(event){
 		player.rot = (player.rot-(Math.PI/400))%(Math.PI*2);
 	}
 
-	if(player.onground){
+	if(player.onground && !player.onland){
 		player.speed = Math.max(0,player.speed-0.0625);
 	}
 	if(player.left || player.right){
@@ -341,7 +368,7 @@ function game_tick(event){
 		}
 	}
 
-	if(player.onbeach){
+	if(player.onland){
 		if(player.speed > 1){
 			player.speed = Math.max(1,player.speed-1);
 		}
@@ -436,6 +463,19 @@ function game_tick(event){
 		}
 	}
 
+	if(tickCount % (35-Math.floor(player.speed)) === 0){
+		if(player.anim !== 0){
+			player.walkframe = (player.walkframe+1)%player.totalwalkframes;
+			if(player.walkframe === 0 && player.anim !== 0){
+				player.walkframe++;
+			}
+		}
+		else{
+			player.walkframe = 0;
+		}
+	}
+
+
 
 	if(tickCount%750 === 0){
 		gameTime++;
@@ -455,6 +495,19 @@ function game_tick(event){
 
 	player.onbeach = map.onbeach(player.x,player.y);
 	player.onground = map.onground(player.x,player.y);
+	player.onland = map.onvillagerland(player.x,player.y);
+
+
+	if(player.onbeach || player.onground){
+		if(player.canoepos.length < 3){
+			player.canoepos = [player.x,player.y,player.rot];
+		}
+	}
+	else{
+		if(player.canoepos.length === 3){
+			player.canoepos = new Array();
+		}
+	}
 
 
 	tickCount++;
