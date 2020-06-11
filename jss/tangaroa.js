@@ -38,47 +38,8 @@ function setUp(){
 	canvas.height = MAX_Y;
 
 
-	player = new Object();
-	player.rx = 0;
-	player.ry = 0;
-	player.x = 0;
-	player.y = 0;
-	player.wx = 0;
-	player.wy = 0;
+	player = new Player();
 
-
-	player.rot = 5/4*Math.PI;
-	player.xs = 0;
-	player.ys = 0;
-	player.speed = 0;
-	player.push = 0;
-
-	player.anim = 1;
-	player.frame = 0;
-	player.totalframes = 9;
-
-	player.img = new Image();
-	player.img.src = "assets/player/canoe-sprite-Sheet.png";
-
-	player.walkimg = new Image();
-	player.walkimg.src = "assets/villager/villager-sprite-sheet.png";
-	player.walkspeed = 30;
-	player.walkframe = 0;
-	player.totalwalkframes = 7;
-
-	player.canoe = new Image();
-	player.canoe.src = "assets/player/canoe-empty.png";
-	player.canoepos = new Array();
-
-
-	player.onbeach = false;
-	player.onground = false;
-
-	player.left = false;
-	player.right = false;
-	player.up = false;
-	player.down = false;
-	player.space = false;
 
 
 	lighting_overlay = document.createElement("div");
@@ -135,32 +96,7 @@ function draw_screen(){
 		}
 	}
 
-	ctx.save();
-	ctx.translate(MAX_X/2,MAX_Y/2);
-	ctx.rotate(player.rot - Math.PI/2);
-	if(!player.onground && !player.onbeach){
-		ctx.translate(player.img.width/player.totalframes/-2,player.img.height/-2);
-		ctx.drawImage(player.img, player.img.width/player.totalframes * player.frame, 0, player.img.width/player.totalframes, player.img.height, -2, 0, player.img.width/player.totalframes, player.img.height); //why the -2? I have no idea
-	}
-	else{
-		ctx.translate(player.walkimg.width/player.totalwalkframes/-2,player.walkimg.height/-2);
-		ctx.drawImage(player.walkimg, player.walkimg.width/player.totalwalkframes * player.walkframe, 0, player.walkimg.width/player.totalwalkframes, player.walkimg.height, 0, 0, player.walkimg.width/player.totalwalkframes, player.walkimg.height);
-	}
-	ctx.restore();
 
-	if(player.canoepos.length === 3){
-		ctx.save();
-
-		ctx.translate(MAX_X/2,MAX_Y/2);
-		ctx.translate(player.canoepos[0]-player.x,player.canoepos[1]-player.y);
-
-		ctx.rotate(player.canoepos[2] - Math.PI/2);
-
-		ctx.translate(player.canoe.width/-2,player.canoe.height/-2);
-		ctx.drawImage(player.canoe, 0,0);
-
-		ctx.restore();
-	}
 
 	map.draw_objects(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 
@@ -169,7 +105,7 @@ function draw_screen(){
 		Albatross.albatrosses[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 	}
 
-
+	player.draw(ctx);
 
 	map.draw_lighting(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 
@@ -309,53 +245,11 @@ function game_tick(event){
 
 		player.x = Math.round(player.rx);
 		player.y = Math.round(player.ry);
-
 	}
 
-	if(player.right){
-		player.rot = (player.rot+(Math.PI/400))%(Math.PI*2);
-	}
-	if(player.left){
-		player.rot = (player.rot-(Math.PI/400))%(Math.PI*2);
-	}
-
-	if(player.onground && !player.onland){
-		player.speed = Math.max(0,player.speed-0.0625);
-	}
-	if(player.left || player.right){
-		if(player.up){
-			if(player.speed > 4){
-				player.speed = Math.max(4,player.speed-0.025);
-			}
-		}
-		else{
-			player.speed = Math.max(0,player.speed-0.025);
-		}
-	}
-	if(player.up){
-		player.speed = Math.min(16,player.speed+(player.speed < 4 ? 0.004 : 0.0125));
-	}
-	else{
-		player.speed = Math.max(0,player.speed-0.025);
-	}
-	if(player.speed > 0.35 && tickCount%18==0){
-		if(!player.onbeach && !player.onground){
-			for(let i=0.05;i<1;i+=0.25){
-
-				//main boat particles
-				new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, true, (30 + 5*(1-i)*player.speed*12), Math.round(6*(1-i)/1));
-				new Particle(player.x, player.y, player.speed*(i*i)/2, player.rot, false, (30 + 5*(1-i)*player.speed*12), Math.round(6*(1-i)/1));
+	player.tick(tickCount);
 
 
-				//constructor(x, y, speed, rot, mirror, life = 60, size=4){
-
-
-				//side boat particles
-				new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, true, (30 + 5*(1-i)*player.speed*2), Math.round(3*(1-i)/1), -10.5);
-				new Particle(player.x, player.y, player.speed*(i*i)/3, player.rot, false, (30 + 5*(1-i)*player.speed*2), Math.round(3*(1-i)/1), -10.5);
-			}
-		}
-	}
 	if((tickCount%60 === 0 && player.speed < 6) || (player.speed >=6 && tickCount%60 < (player.speed-6)*4)){
 		let part_x, part_y;
 		for(let iter = 0; iter < 25; iter++){
