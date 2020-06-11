@@ -944,7 +944,7 @@ class TransitIsland{
 }
 
 Island.graphics = new Array();
-for(let img = 0; img<7; img++){
+for(let img = 0; img<8; img++){
 	Island.graphics[img] = new Image();
 }
 
@@ -956,17 +956,19 @@ Island.graphics[1].src = "assets/town/fale2.png";
 Island.graphics[1].shadowScale = 0.8;
 Island.graphics[2].src = "assets/town/stones.png";
 Island.graphics[2].shadowScale = 0;
+//Island.graphics[3].src = "assets/town/chief-fale.png";
+//Island.graphics[3].shadowScale = 0.8;
 
 Island.numTreeGraphics = 3;
-Island.shiftTreeGraphics = 3;
-Island.graphics[3].src = "assets/trees/coconut-tree.png";
-Island.graphics[3].shadowScale = 1;
-Island.graphics[4].src = "assets/trees/coconut-tree2.png";
+Island.shiftTreeGraphics = 4;
+Island.graphics[4].src = "assets/trees/coconut-tree.png";
 Island.graphics[4].shadowScale = 1;
-Island.graphics[5].src = "assets/trees/coconut-tree3.png";
+Island.graphics[5].src = "assets/trees/coconut-tree2.png";
 Island.graphics[5].shadowScale = 1;
+Island.graphics[6].src = "assets/trees/coconut-tree3.png";
+Island.graphics[6].shadowScale = 1;
 
 Island.numPlantGraphics = 1;
-Island.shiftPlantGraphics = 6;
-Island.graphics[6].src = "assets/trees/taro.png";
-Island.graphics[6].shadowScale = 0.25;
+Island.shiftPlantGraphics = 7;
+Island.graphics[7].src = "assets/trees/taro.png";
+Island.graphics[7].shadowScale = 0.25;
