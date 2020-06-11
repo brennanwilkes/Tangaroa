@@ -96,7 +96,7 @@ function draw_screen(){
 		}
 	}
 
-
+	player.draw(ctx);
 
 	map.draw_objects(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 
@@ -105,7 +105,7 @@ function draw_screen(){
 		Albatross.albatrosses[b].draw(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 	}
 
-	player.draw(ctx);
+
 
 	map.draw_lighting(ctx,player.x*-1 + MAX_X/2,player.y*-1 + MAX_Y/2);
 
@@ -262,32 +262,12 @@ function game_tick(event){
 		}
 	}
 
-	if(player.onland){
-		if(player.speed > 1){
-			player.speed = Math.max(1,player.speed-1);
-		}
-
-		if(!map.visted){
-			if(map.attown(player.x,player.y)){
-				console.log("Welcome to "+map.name);
-				map.visted = true;
-			}
-		}
+	if(player.onland && !map.visted && map.attown(player.x,player.y)){
+		console.log("Welcome to "+map.name);
+		map.visted = true;
 	}
 
-	player.xs = player.speed*Math.cos(player.rot)/4;
-	player.ys = player.speed*Math.sin(player.rot)/4;
 
-	//random waves
-	if(player.speed > 4){
-
-		if(tickCount%240 === 0){
-			player.push = (Math.random()*0.01-0.005) * Math.PI;
-		}
-		else if(tickCount%240 < 90){
-			player.rot += player.push/3;
-		}
-	}
 
 	if(player.speed > 4 && Boid.totalBoids < 5 && map.is_transit) {
 		let num_new_boids = ran_b(6,12);
@@ -337,37 +317,7 @@ function game_tick(event){
 		}
 	}
 
-	player.rx = player.rx-player.xs;
-	player.ry = player.ry-player.ys;
 
-	player.x = Math.round(player.rx);
-	player.y = Math.round(player.ry);
-
-	if(player.up){
-		player.anim = 1;
-	}
-	else{
-		player.anim = 0;
-	}
-
-	if(tickCount % (35-Math.floor(player.speed)) === 0 && (player.anim !== 0 || player.frame !== 0)){
-		player.frame = (player.frame+1)%player.totalframes;
-		if(player.frame === 0 && player.anim !== 0){
-			player.frame++;
-		}
-	}
-
-	if(tickCount % (35-Math.floor(player.speed)) === 0){
-		if(player.anim !== 0){
-			player.walkframe = (player.walkframe+1)%player.totalwalkframes;
-			if(player.walkframe === 0 && player.anim !== 0){
-				player.walkframe++;
-			}
-		}
-		else{
-			player.walkframe = 0;
-		}
-	}
 
 
 
@@ -387,21 +337,7 @@ function game_tick(event){
 	draw_screen();
 
 
-	player.onbeach = map.onbeach(player.x,player.y);
-	player.onground = map.onground(player.x,player.y);
-	player.onland = map.onvillagerland(player.x,player.y);
 
-
-	if(player.onbeach || player.onground){
-		if(player.canoepos.length < 3){
-			player.canoepos = [player.x,player.y,player.rot];
-		}
-	}
-	else{
-		if(player.canoepos.length === 3){
-			player.canoepos = new Array();
-		}
-	}
 
 
 	tickCount++;

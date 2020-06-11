@@ -117,6 +117,72 @@ class Player{
 		if(this.speed > 0.35 && tickCount%18==0 && !this.onbeach && !this.onground){
 			this.spawnParticles();
 		}
+
+		if(this.onland && this.speed > 1){
+			this.speed = Math.max(1,this.speed-1);
+		}
+
+		this.xs = this.speed*Math.cos(this.rot)/4;
+		this.ys = this.speed*Math.sin(this.rot)/4;
+
+		//random waves
+		if(this.speed > 4){
+
+			if(tickCount%240 === 0){
+				this.push = (Math.random()*0.01-0.005) * Math.PI;
+			}
+			else if(tickCount%240 < 90){
+				this.rot += this.push/3;
+			}
+		}
+
+		this.rx = this.rx-this.xs;
+		this.ry = this.ry-this.ys;
+
+		this.x = Math.round(this.rx);
+		this.y = Math.round(this.ry);
+
+		if(this.up){
+			this.anim = 1;
+		}
+		else{
+			this.anim = 0;
+		}
+
+		if(tickCount % (35-Math.floor(this.speed)) === 0 && (this.anim !== 0 || this.frame !== 0)){
+			this.frame = (this.frame+1)%this.totalframes;
+			if(this.frame === 0 && this.anim !== 0){
+				this.frame++;
+			}
+		}
+
+		if(tickCount % (35-Math.floor(this.speed)) === 0){
+			if(this.anim !== 0){
+				this.walkframe = (this.walkframe+1)%this.totalwalkframes;
+				if(this.walkframe === 0 && this.anim !== 0){
+					this.walkframe++;
+				}
+			}
+			else{
+				this.walkframe = 0;
+			}
+		}
+
+		this.onbeach = map.onbeach(this.x,this.y);
+		this.onground = map.onground(this.x,this.y);
+		this.onland = map.onvillagerland(this.x,this.y);
+
+
+		if(this.onbeach || this.onground){
+			if(this.canoepos.length < 3){
+				this.canoepos = [this.x,this.y,this.rot];
+			}
+		}
+		else{
+			if(this.canoepos.length === 3){
+				this.canoepos = new Array();
+			}
+		}
 	}
 
 }
