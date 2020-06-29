@@ -2,6 +2,8 @@ class Villager{
 	constructor(x,y){
 		this.position = [x,y];
 		this.img = new Image();
+		this.img.origin="anonymous";
+		this.img.crossorigin="anonymous";
 		this.img.src = "assets/villager/villager-sprite-sheet.png"
 		this.state = 1;
 		this.frame = 0;

@@ -351,6 +351,11 @@ function buildImage(objects=false,lighting=true){
 	let img_ctx = saved_img.getContext("2d");
 
 	img_ctx.drawImage(map.canvas_img,0,0);
+
+	for(let v = 0; v < Villager.totalVillagers; v++){
+		Villager.villagers[v].draw(img_ctx,0,0);
+	}
+
 	if(lighting) img_ctx.drawImage(map.lighting_img,0,0);
 	if(objects) img_ctx.drawImage(map.objects_img,0,0);
 
