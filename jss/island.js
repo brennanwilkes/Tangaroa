@@ -946,6 +946,9 @@ class TransitIsland{
 Island.graphics = new Array();
 for(let img = 0; img<8; img++){
 	Island.graphics[img] = new Image();
+	Island.graphics[img].origin="anonymous";
+	Island.graphics[img].crossorigin="anonymous";
+
 }
 
 

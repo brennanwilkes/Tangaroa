@@ -342,3 +342,21 @@ function game_tick(event){
 
 	tickCount++;
 }
+
+function buildImage(objects=false,lighting=true){
+
+	let saved_img=document.createElement("canvas");
+	saved_img.width = map.size[0];
+	saved_img.height = map.size[1];
+	let img_ctx = saved_img.getContext("2d");
+
+	img_ctx.drawImage(map.canvas_img,0,0);
+	if(lighting) img_ctx.drawImage(map.lighting_img,0,0);
+	if(objects) img_ctx.drawImage(map.objects_img,0,0);
+
+
+	var link = document.createElement('a');
+	link.setAttribute('download', 'island-Download.png');
+	link.setAttribute('href', saved_img.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+	link.click();
+}
