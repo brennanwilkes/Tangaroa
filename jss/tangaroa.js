@@ -343,7 +343,7 @@ function game_tick(event){
 	tickCount++;
 }
 
-function buildImage(objects=false,lighting=true,villagers=false){
+function buildImage(objects=true,lighting=false,villagers=false){
 
 	let saved_img=document.createElement("canvas");
 	saved_img.width = map.size[0];
