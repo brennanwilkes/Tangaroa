@@ -343,7 +343,7 @@ function game_tick(event){
 	tickCount++;
 }
 
-function buildImage(objects=false,lighting=true){
+function buildImage(objects=false,lighting=true,villagers=false){
 
 	let saved_img=document.createElement("canvas");
 	saved_img.width = map.size[0];
@@ -352,16 +352,19 @@ function buildImage(objects=false,lighting=true){
 
 	img_ctx.drawImage(map.canvas_img,0,0);
 
-	for(let v = 0; v < Villager.totalVillagers; v++){
-		Villager.villagers[v].draw(img_ctx,0,0);
+	if(villagers){
+		for(let v = 0; v < Villager.totalVillagers; v++){
+			Villager.villagers[v].draw(img_ctx,0,0);
+		}
 	}
+
 
 	if(lighting) img_ctx.drawImage(map.lighting_img,0,0);
 	if(objects) img_ctx.drawImage(map.objects_img,0,0);
 
 
 	var link = document.createElement('a');
-	link.setAttribute('download', 'island-Download.png');
+	link.setAttribute("download","Tangaroa-"+map.name.replace(' ','-')+".png");
 	link.setAttribute('href', saved_img.toDataURL("image/png").replace("image/png", "image/octet-stream"));
 	link.click();
 }
