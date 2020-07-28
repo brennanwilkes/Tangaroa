@@ -2,7 +2,8 @@ var scrollId;
 var scrollAmt;
 
 function QuickPlay(event){
-	world = new Map(true);
+	world = new Map(false,1);
+	//world = new Map(true);
 	start_game();
 }
 
